@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from app.ui.before_after_editor import BeforeAfterEditor
 from app.core.ollama_client import OllamaClient, OllamaClientError
+from app.core.prompt_builder import PromptBuilder, ReviewCategory, OutputFormat
 
 
 class MainWindow(QMainWindow):
@@ -35,6 +36,9 @@ class MainWindow(QMainWindow):
         # Initialize Ollama client
         self.ollama_client = None
         self.ollama_status = "Disconnected"
+
+        # Initialize Prompt Builder
+        self.prompt_builder = PromptBuilder()
 
         # Setup UI
         self._setup_ui()
@@ -338,45 +342,90 @@ class MainWindow(QMainWindow):
     def _on_analyze(self):
         """Handle Analyze action."""
 
-        # Get before code
+        # 분석할 코드 가져오기
         before_code = self.editor.get_before_text().strip()
 
         if not before_code:
-            QMessageBox.warning(self, "No Code", "Please paste C# code in the Before editor.")
+            QMessageBox.warning(self, "코드 없음", "Before 에디터에 C# 코드를 붙여넣어주세요.")
             return
 
         if self.ollama_client is None:
-            QMessageBox.warning(self, "Not Connected", "Ollama client not connected. Please check connection.")
+            QMessageBox.warning(self, "연결 안 됨", "Ollama 클라이언트가 연결되지 않았습니다. 연결을 확인해주세요.")
             return
 
-        # Disable analyze button during analysis
+        # 분석 중 버튼 비활성화
         self.analyze_button.setEnabled(False)
-        self.statusBar().showMessage("Analyzing code...", 0)
+        self.statusBar().showMessage("코드 분석 중... (최대 30초 소요)", 0)
 
-        # For now, just show a placeholder message
-        # TODO: Implement actual code analysis in Day 5
-        placeholder_after = """// Analysis not yet implemented
-// This will be completed in Day 5 (Prompt Builder implementation)
+        try:
+            # 모든 리뷰 카테고리 활성화
+            categories = [
+                ReviewCategory.NULL_REFERENCE,
+                ReviewCategory.EXCEPTION_HANDLING,
+                ReviewCategory.RESOURCE_MANAGEMENT,
+                ReviewCategory.PERFORMANCE,
+                ReviewCategory.SECURITY,
+                ReviewCategory.NAMING_CONVENTION
+            ]
 
-// For now, showing placeholder response
-public class ImprovedExample
-{
-    // TODO: AI-generated improved code will appear here
-}"""
+            # 프롬프트 생성
+            prompt = self.prompt_builder.build_review_prompt(
+                code=before_code,
+                categories=categories,
+                output_format=OutputFormat.IMPROVED_CODE,
+                include_examples=True
+            )
 
-        self.editor.set_after_text(placeholder_after)
+            # 시스템 프롬프트와 사용자 프롬프트 결합
+            full_prompt = f"{self.prompt_builder.SYSTEM_PROMPT}\n\n{prompt}"
 
-        # Re-enable analyze button
-        self.analyze_button.setEnabled(True)
-        self.statusBar().showMessage("Analysis complete (placeholder - full implementation in Day 5)", 5000)
+            # 상태바 업데이트
+            self.statusBar().showMessage("LLM 분석 중... (Phi-3-mini)", 0)
 
-        QMessageBox.information(
-            self,
-            "Analysis Placeholder",
-            "Code analysis is not yet implemented.\n\n"
-            "This will be completed in Day 5 when we implement the Prompt Builder.\n\n"
-            "For now, a placeholder response is shown in the After editor."
-        )
+            # Ollama로 코드 분석 (스트리밍 비활성화)
+            improved_code = self.ollama_client.analyze_code(
+                prompt=full_prompt,
+                stream=False  # 간단하게 비스트리밍 모드 사용
+            )
+
+            # 결과를 After 에디터에 표시
+            self.editor.set_after_text(improved_code)
+
+            # 성공 메시지
+            self.statusBar().showMessage("✅ 코드 분석 완료!", 5000)
+
+            QMessageBox.information(
+                self,
+                "분석 완료",
+                f"코드 분석이 완료되었습니다!\n\n"
+                f"적용된 리뷰 카테고리:\n"
+                f"• Null 참조 체크\n"
+                f"• Exception 처리\n"
+                f"• 리소스 관리\n"
+                f"• 성능 최적화\n"
+                f"• 보안\n"
+                f"• 네이밍 컨벤션\n\n"
+                f"개선된 코드가 After 에디터에 표시되었습니다."
+            )
+
+        except Exception as e:
+            # 에러 처리
+            self.statusBar().showMessage(f"❌ 분석 실패: {str(e)}", 10000)
+
+            QMessageBox.critical(
+                self,
+                "분석 실패",
+                f"코드 분석 중 오류가 발생했습니다.\n\n"
+                f"오류: {str(e)}\n\n"
+                f"다음을 확인해주세요:\n"
+                f"1. Ollama 서버가 실행 중인지\n"
+                f"2. phi3:mini 모델이 다운로드되었는지\n"
+                f"3. 네트워크 연결 상태"
+            )
+
+        finally:
+            # 분석 완료 후 버튼 다시 활성화
+            self.analyze_button.setEnabled(True)
 
     def _on_about(self):
         """Handle About action."""
