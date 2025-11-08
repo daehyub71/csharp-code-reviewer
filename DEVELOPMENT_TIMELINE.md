@@ -78,33 +78,48 @@
 
 ---
 
-#### Day 3 (2025-01-10): PySide6 기본 UI 및 Before/After 에디터
+#### Day 3 (2025-01-10): PySide6 기본 UI 및 Before/After 에디터 ✅
 **목표**: 메인 윈도우 및 코드 에디터 구현
 
 **Tasks**:
-- [ ] `app/main.py` 작성
-  - [ ] PySide6 QApplication 초기화
-  - [ ] 메인 윈도우 생성
-  - [ ] 이벤트 루프 실행
-- [ ] `app/ui/main_window.py` 구현
-  - [ ] 메인 윈도우 레이아웃
-  - [ ] 메뉴바 (파일, 편집, 도움말)
-  - [ ] 툴바 (분석 시작, 설정)
-  - [ ] 상태바 (Ollama 상태 표시)
-- [ ] `app/ui/before_after_editor.py` 구현
-  - [ ] QPlainTextEdit 기반 코드 에디터
-  - [ ] Before 에디터 (사용자 입력)
-  - [ ] After 에디터 (읽기 전용)
-  - [ ] Vertical Splitter (50:50 분할)
-  - [ ] 복사 버튼 (Before/After 각각)
-- [ ] 기본 스타일링
-  - [ ] resources/styles/dark_theme.qss 작성
-  - [ ] 폰트 설정 (Consolas, Monaco)
+- [x] `app/main.py` 작성
+  - [x] PySide6 QApplication 초기화
+  - [x] 메인 윈도우 생성
+  - [x] 이벤트 루프 실행
+  - [x] High DPI scaling 지원
+  - [x] 다크 테마 스타일시트 로드
+- [x] `app/ui/main_window.py` 구현 (370+ lines)
+  - [x] 메인 윈도우 레이아웃 (1400x800)
+  - [x] 메뉴바 (파일, 편집, 도구, 도움말)
+    - 파일: New, Open, Save, Exit
+    - 편집: Copy Before/After, Clear All
+    - 도구: Analyze Code, Test Ollama Connection
+    - 도움말: About
+  - [x] 툴바 (Analyze, Clear, Settings 버튼)
+  - [x] 상태바 (Ollama 상태 실시간 표시, 모델 정보)
+  - [x] Ollama 연결 테스트 및 자동 상태 업데이트
+- [x] `app/ui/before_after_editor.py` 구현 (260+ lines)
+  - [x] QPlainTextEdit 기반 CodeEditor 클래스
+  - [x] EditorPanel (제목 + 에디터 + 복사 버튼)
+  - [x] Before 에디터 (편집 가능, placeholder 텍스트)
+  - [x] After 에디터 (읽기 전용)
+  - [x] Horizontal Splitter (50:50 분할, 드래그 가능)
+  - [x] 복사 버튼 (📋 Copy) 및 클립보드 기능
+  - [x] Signal/Slot 연결 (text_changed 이벤트)
+- [x] 기본 스타일링
+  - [x] resources/styles/dark_theme.qss 작성 (VS Code Dark+ 테마)
+  - [x] 폰트 설정 (Monaco, Consolas, Courier New - monospace)
+  - [x] 색상 스키마 (#1e1e1e 배경, #d4d4d4 텍스트)
+  - [x] 버튼, 메뉴, 스크롤바, Splitter 스타일링
 
-**산출물**:
-- 메인 윈도우 UI 완성
-- Before/After 에디터 동작 확인
-- 기본 다크 테마 적용
+**산출물**: ✅
+- 메인 윈도우 UI 완성 (app/main.py, app/ui/main_window.py)
+- Before/After 에디터 동작 확인 (app/ui/before_after_editor.py)
+- VS Code Dark+ 스타일 다크 테마 적용 (resources/styles/dark_theme.qss)
+- Ollama 연결 상태 실시간 모니터링
+- 파일 열기/저장 기능 구현
+- 키보드 단축키 지원 (F5: Analyze, Ctrl+O: Open, Ctrl+S: Save, etc.)
+- **GUI 테스트 성공**: 모든 윈도우 정상 실행 확인
 
 ---
 
