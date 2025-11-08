@@ -127,31 +127,33 @@
 **목표**: 코드 가독성 향상 및 UX 개선
 
 **Tasks**:
-- [ ] `app/utils/syntax_highlighter.py` 구현
-  - [ ] QSyntaxHighlighter 상속
-  - [ ] C# 키워드 정의 (class, public, void, if, etc.)
-  - [ ] 정규식 기반 토큰 파싱
-  - [ ] 색상 스키마 정의
+- [x] `app/utils/syntax_highlighter.py` 구현
+  - [x] QSyntaxHighlighter 상속
+  - [x] C# 키워드 정의 (class, public, void, if, etc.)
+  - [x] 정규식 기반 토큰 파싱
+  - [x] 색상 스키마 정의
     - 키워드: #569CD6 (파란색)
     - 문자열: #CE9178 (주황색)
     - 주석: #6A9955 (초록색)
     - 숫자: #B5CEA8 (연두색)
-- [ ] Syntax Highlighter 적용
-  - [ ] Before/After 에디터에 연결
-  - [ ] 실시간 하이라이팅 확인
-- [ ] 동기화 스크롤 구현
-  - [ ] Before 에디터 스크롤 이벤트 감지
-  - [ ] After 에디터 스크롤 위치 동기화
-  - [ ] 토글 버튼 (동기화 ON/OFF)
-- [ ] 추가 기능
-  - [ ] 라인 번호 표시
-  - [ ] 현재 줄 하이라이팅
-  - [ ] Ctrl+A 전체 선택 단축키
+- [x] Syntax Highlighter 적용
+  - [x] Before/After 에디터에 연결
+  - [x] 실시간 하이라이팅 확인
+- [x] 동기화 스크롤 구현
+  - [x] Before 에디터 스크롤 이벤트 감지
+  - [x] After 에디터 스크롤 위치 동기화
+  - [x] 토글 버튼 (동기화 ON/OFF)
+- [x] 추가 기능
+  - [x] 라인 번호 표시
+  - [x] 현재 줄 하이라이팅
+  - [x] Ctrl+A 전체 선택 단축키 (기본 QPlainTextEdit 기능으로 지원됨)
 
 **산출물**:
-- C# Syntax Highlighting 완성
-- 동기화 스크롤 동작 확인
-- 사용자 친화적 에디터 완성
+- C# Syntax Highlighting 완성 ✅
+- 동기화 스크롤 동작 확인 ✅
+- 사용자 친화적 에디터 완성 ✅
+
+**완료일**: 2025-01-11
 
 ---
 
