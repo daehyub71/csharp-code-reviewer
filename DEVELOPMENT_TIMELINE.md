@@ -6,35 +6,42 @@
 
 ### Week 1: 기본 구조 및 LLM 통합 (Day 1-4)
 
-#### Day 1 (2025-01-08): 프로젝트 초기 설정
+#### Day 1 (2025-01-08): 프로젝트 초기 설정 ✅
 **목표**: 개발 환경 구축 및 프로젝트 구조 생성
 
 **Tasks**:
-- [ ] 프로젝트 계획서 작성
-  - [ ] PROJECT_PLAN.md
-  - [ ] DEVELOPMENT_TIMELINE.md
-  - [ ] README.md
-  - [ ] TECHNICAL_SPECIFICATION.md
-- [ ] Git 저장소 생성
-  - [ ] `.gitignore` 설정 (Python, PySide6)
-  - [ ] 초기 커밋
-- [ ] 프로젝트 디렉토리 구조 생성
-  - [ ] app/ui/, app/core/, app/utils/, app/config/
-  - [ ] tests/, docs/, resources/, scripts/
-- [ ] Python 가상환경 설정
-  - [ ] venv 생성 (Python 3.11+)
-  - [ ] requirements.txt 작성
-  - [ ] 기본 의존성 설치
-    - PySide6
-    - ollama
-    - markdown
-    - pygments
-    - pytest
+- [x] 프로젝트 계획서 작성
+  - [x] PROJECT_PLAN.md
+  - [x] DEVELOPMENT_TIMELINE.md
+  - [x] README.md
+  - [x] TECHNICAL_SPECIFICATION.md
+  - [x] CLAUDE.md (추가)
+- [x] Git 저장소 생성
+  - [x] `.gitignore` 설정 (Python, PySide6)
+  - [x] 초기 커밋
+- [x] 프로젝트 디렉토리 구조 생성
+  - [x] app/ui/, app/core/, app/utils/, app/config/
+  - [x] tests/, docs/, resources/, scripts/
+  - [x] __init__.py 파일 생성 (Python 패키지)
+- [x] Python 가상환경 설정
+  - [x] venv 생성 (Python 3.13.7)
+  - [x] requirements.txt 작성
+  - [x] 기본 의존성 설치
+    - PySide6 (6.10.0)
+    - ollama (0.6.0)
+    - markdown (3.10)
+    - pygments (2.19.2)
+    - pytest (8.4.2)
+    - pytest-qt (4.5.0)
+    - pytest-cov (7.0.0)
+    - PyInstaller (6.16.0)
+    - python-dotenv (1.2.1)
 
-**산출물**:
+**산출물**: ✅
 - 프로젝트 구조 완성
 - 가상환경 및 의존성 설치 완료
-- 문서화 (4개 주요 문서)
+- 문서화 (5개 주요 문서: PROJECT_PLAN, DEVELOPMENT_TIMELINE, README, TECHNICAL_SPECIFICATION, CLAUDE)
+- Git 저장소 초기화 및 첫 커밋 완료
 
 ---
 
