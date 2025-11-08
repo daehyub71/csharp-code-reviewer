@@ -206,28 +206,41 @@
 **목표**: LLM 응답을 Markdown 리포트로 변환
 
 **Tasks**:
-- [ ] `app/core/report_generator.py` 구현
-  - [ ] LLM 응답 파싱
-  - [ ] Markdown 구조화
-    - 요약 섹션 (발견 이슈 개수)
-    - 이슈별 상세 (심각도, 위치, 개선 코드)
-    - 플로우 다이어그램
-    - 잘된 점
-  - [ ] After 코드 추출 (개선 코드)
-  - [ ] 메타데이터 추가 (분석 시각, 모델명)
-- [ ] Markdown 템플릿
-  - [ ] resources/templates/report_template.md
-  - [ ] GitHub 스타일 형식
-  - [ ] 코드 블록 (```csharp```)
-- [ ] 파일 저장 기능
-  - [ ] 파일명 자동 생성 (코드리뷰_{타임스탬프}.md)
-  - [ ] 저장 위치 선택 다이얼로그
-  - [ ] 덮어쓰기 경고
+- [x] `app/core/report_generator.py` 구현
+  - [x] LLM 응답 파싱
+  - [x] Markdown 구조화
+    - 요약 섹션 (줄 수, 추가 줄, 카테고리)
+    - 적용된 리뷰 카테고리
+    - Before/After 코드 비교
+    - 주요 개선 사항 (휴리스틱 분석)
+  - [x] After 코드 추출 (마크다운 블록 제거)
+  - [x] 메타데이터 추가 (분석 시각, 모델명)
+- [x] Markdown 템플릿
+  - [x] resources/templates/report_template.md
+  - [x] GitHub 스타일 형식
+  - [x] 코드 블록 (```csharp```)
+- [x] 파일 저장 기능
+  - [x] 파일명 자동 생성 (code_review_{타임스탬프}.md)
+  - [x] 저장 위치 선택 다이얼로그
+  - [x] 프로그레스 다이얼로그
+- [x] MainWindow 통합
+  - [x] 분석 중 프로그레스바 표시
+  - [x] 분석 결과 저장 (last_analysis)
+  - [x] 리포트 저장 기능 개선
+  - [x] 한글 UI 메시지
 
 **산출물**:
-- Report Generator 완성
-- Markdown 템플릿 작성
-- 파일 저장 기능 동작 확인
+- Report Generator 완성 ✅
+- Markdown 템플릿 작성 ✅
+- 파일 저장 기능 동작 확인 ✅
+
+**테스트 결과**:
+- ✅ 리포트 생성 테스트 (모든 섹션 검증 통과)
+- ✅ 파일 저장 테스트 (임시 디렉토리 저장 확인)
+- ✅ 파일명 생성 테스트 (타임스탬프 형식 확인)
+- ✅ 코드 추출 테스트 (마크다운 블록 제거)
+
+**완료일**: 2025-01-13
 
 ---
 

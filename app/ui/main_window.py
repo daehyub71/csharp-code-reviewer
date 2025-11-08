@@ -10,7 +10,7 @@ from pathlib import Path
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QMenuBar, QMenu, QToolBar, QStatusBar, QPushButton,
-    QLabel, QMessageBox, QFileDialog
+    QLabel, QMessageBox, QFileDialog, QProgressDialog
 )
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtGui import QAction, QKeySequence, QIcon
@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from app.ui.before_after_editor import BeforeAfterEditor
 from app.core.ollama_client import OllamaClient, OllamaClientError
 from app.core.prompt_builder import PromptBuilder, ReviewCategory, OutputFormat
+from app.core.report_generator import ReportGenerator
 
 
 class MainWindow(QMainWindow):
@@ -39,6 +40,16 @@ class MainWindow(QMainWindow):
 
         # Initialize Prompt Builder
         self.prompt_builder = PromptBuilder()
+
+        # Initialize Report Generator
+        self.report_generator = ReportGenerator()
+
+        # Store last analysis results
+        self.last_analysis = {
+            'original_code': '',
+            'improved_code': '',
+            'categories': []
+        }
 
         # Setup UI
         self._setup_ui()
@@ -88,9 +99,9 @@ class MainWindow(QMainWindow):
         file_menu.addAction(open_action)
 
         # Save action
-        save_action = QAction("&Save Report...", self)
+        save_action = QAction("리포트 저장(&S)...", self)
         save_action.setShortcut(QKeySequence.StandardKey.Save)
-        save_action.setStatusTip("Save code review report")
+        save_action.setStatusTip("코드 리뷰 리포트를 Markdown으로 저장")
         save_action.triggered.connect(self._on_save)
         file_menu.addAction(save_action)
 
@@ -306,23 +317,75 @@ class MainWindow(QMainWindow):
 
     def _on_save(self):
         """Handle Save action."""
+
+        # 분석 결과가 있는지 확인
+        if not self.last_analysis.get('improved_code'):
+            QMessageBox.warning(
+                self,
+                "저장 실패",
+                "저장할 분석 결과가 없습니다.\n\n"
+                "먼저 코드 분석을 실행해주세요."
+            )
+            return
+
+        # 자동 파일명 생성
+        default_filename = self.report_generator.generate_filename()
+
+        # 저장 위치 선택
         file_path, _ = QFileDialog.getSaveFileName(
             self,
-            "Save Report",
-            "code_review_report.md",
+            "리포트 저장",
+            default_filename,
             "Markdown Files (*.md);;All Files (*)"
         )
 
         if file_path:
             try:
-                # For now, just save the after code
-                # In the future, this will save a full report
-                content = self.editor.get_after_text()
-                with open(file_path, 'w', encoding='utf-8') as f:
-                    f.write(content)
-                    self.statusBar().showMessage(f"Saved: {file_path}", 5000)
+                # 프로그레스 다이얼로그
+                progress = QProgressDialog("리포트 생성 중...", None, 0, 100, self)
+                progress.setWindowTitle("리포트 저장")
+                progress.setWindowModality(Qt.WindowModality.WindowModal)
+                progress.setMinimumDuration(0)
+                progress.setValue(0)
+
+                # 리포트 생성
+                progress.setLabelText("Markdown 리포트 생성 중...")
+                progress.setValue(30)
+
+                report = self.report_generator.generate_report(
+                    original_code=self.last_analysis['original_code'],
+                    improved_code=self.last_analysis['improved_code'],
+                    categories=self.last_analysis['categories'],
+                    model_name="phi3:mini"
+                )
+
+                # 파일 저장
+                progress.setLabelText("파일 저장 중...")
+                progress.setValue(70)
+
+                self.report_generator.save_report(report, file_path)
+
+                progress.setValue(100)
+                progress.close()
+
+                # 성공 메시지
+                self.statusBar().showMessage(f"✅ 리포트 저장 완료: {file_path}", 5000)
+
+                QMessageBox.information(
+                    self,
+                    "저장 완료",
+                    f"리포트가 성공적으로 저장되었습니다!\n\n"
+                    f"저장 위치: {file_path}\n\n"
+                    f"Markdown 뷰어로 확인하실 수 있습니다."
+                )
+
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to save file:\n{e}")
+                QMessageBox.critical(
+                    self,
+                    "저장 실패",
+                    f"리포트 저장 중 오류가 발생했습니다.\n\n"
+                    f"오류: {str(e)}"
+                )
 
     def _on_copy_before(self):
         """Handle Copy Before action."""
@@ -353,11 +416,21 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "연결 안 됨", "Ollama 클라이언트가 연결되지 않았습니다. 연결을 확인해주세요.")
             return
 
+        # 프로그레스 다이얼로그 생성
+        progress = QProgressDialog("코드 분석 중...", "취소", 0, 100, self)
+        progress.setWindowTitle("AI 코드 분석")
+        progress.setWindowModality(Qt.WindowModality.WindowModal)
+        progress.setMinimumDuration(0)
+        progress.setValue(0)
+
         # 분석 중 버튼 비활성화
         self.analyze_button.setEnabled(False)
-        self.statusBar().showMessage("코드 분석 중... (최대 30초 소요)", 0)
 
         try:
+            # Step 1: 프롬프트 생성 (10%)
+            progress.setLabelText("프롬프트 생성 중...")
+            progress.setValue(10)
+
             # 모든 리뷰 카테고리 활성화
             categories = [
                 ReviewCategory.NULL_REFERENCE,
@@ -379,17 +452,37 @@ class MainWindow(QMainWindow):
             # 시스템 프롬프트와 사용자 프롬프트 결합
             full_prompt = f"{self.prompt_builder.SYSTEM_PROMPT}\n\n{prompt}"
 
-            # 상태바 업데이트
-            self.statusBar().showMessage("LLM 분석 중... (Phi-3-mini)", 0)
+            # Step 2: LLM 분석 (30%)
+            progress.setLabelText("AI 분석 중... (Phi-3-mini)")
+            progress.setValue(30)
+
+            if progress.wasCanceled():
+                self.statusBar().showMessage("분석이 취소되었습니다.", 3000)
+                return
 
             # Ollama로 코드 분석 (스트리밍 비활성화)
             improved_code = self.ollama_client.analyze_code(
                 prompt=full_prompt,
-                stream=False  # 간단하게 비스트리밍 모드 사용
+                stream=False
             )
+
+            # Step 3: 결과 처리 (80%)
+            progress.setLabelText("결과 처리 중...")
+            progress.setValue(80)
 
             # 결과를 After 에디터에 표시
             self.editor.set_after_text(improved_code)
+
+            # 분석 결과 저장 (리포트 생성용)
+            self.last_analysis = {
+                'original_code': before_code,
+                'improved_code': improved_code,
+                'categories': [cat.value for cat in categories]
+            }
+
+            # Step 4: 완료 (100%)
+            progress.setValue(100)
+            progress.close()
 
             # 성공 메시지
             self.statusBar().showMessage("✅ 코드 분석 완료!", 5000)
@@ -405,10 +498,13 @@ class MainWindow(QMainWindow):
                 f"• 성능 최적화\n"
                 f"• 보안\n"
                 f"• 네이밍 컨벤션\n\n"
-                f"개선된 코드가 After 에디터에 표시되었습니다."
+                f"개선된 코드가 After 에디터에 표시되었습니다.\n"
+                f"리포트를 저장하려면 '파일 > 리포트 저장'을 사용하세요."
             )
 
         except Exception as e:
+            progress.close()
+
             # 에러 처리
             self.statusBar().showMessage(f"❌ 분석 실패: {str(e)}", 10000)
 
