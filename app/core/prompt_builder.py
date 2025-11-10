@@ -27,6 +27,7 @@ class ReviewCategory(Enum):
     SECURITY = "security"  # 보안 취약점
     NAMING_CONVENTION = "naming_convention"  # 네이밍 컨벤션
     CODE_DOCUMENTATION = "code_documentation"  # XML 문서 주석
+    HARDCODING_TO_CONFIG = "hardcoding_to_config"  # 하드코딩 → Config 파일
 
 
 class OutputFormat(Enum):
@@ -124,6 +125,18 @@ class PromptBuilder:
                 "<remarks>: 상세 설명 (옵션)",
                 "<example>: 사용 예제 (옵션)"
             ]
+        },
+        ReviewCategory.HARDCODING_TO_CONFIG: {
+            "name": "하드코딩 → Config 파일",
+            "description": "하드코딩된 설정값을 외부 설정 파일(appsettings.json, .env)로 분리",
+            "rules": [
+                "연결 문자열은 appsettings.json의 ConnectionStrings 섹션으로",
+                "API URL은 appsettings.json의 ApiSettings 섹션으로",
+                "매직 넘버는 상수(const) 또는 enum으로 분리",
+                "파일 경로는 IConfiguration으로 관리",
+                "환경별 설정은 appsettings.{Environment}.json 활용",
+                "IConfiguration 인터페이스를 통한 의존성 주입"
+            ]
         }
     }
 
@@ -207,6 +220,67 @@ public class UserService
         return database.Find(userId);
     }
 }"""
+        },
+        {
+            "category": ReviewCategory.HARDCODING_TO_CONFIG,
+            "before": """public class UserService
+{
+    public async Task<User> GetUserAsync(int userId)
+    {
+        var apiUrl = "https://api.example.com/v1/users/" + userId;
+        using var client = new HttpClient();
+        client.Timeout = TimeSpan.FromSeconds(30);
+        var response = await client.GetAsync(apiUrl);
+        return await response.Content.ReadFromJsonAsync<User>();
+    }
+}
+
+public class DatabaseHelper
+{
+    public SqlConnection GetConnection()
+    {
+        var connectionString = "Server=localhost;Database=MyDB;User Id=admin;Password=admin123;";
+        return new SqlConnection(connectionString);
+    }
+}""",
+            "after": """public class UserService
+{
+    private readonly HttpClient _httpClient;
+    private readonly IConfiguration _configuration;
+
+    public UserService(HttpClient httpClient, IConfiguration configuration)
+    {
+        _httpClient = httpClient;
+        _configuration = configuration;
+        var timeout = _configuration.GetValue<int>("ApiSettings:Timeout");
+        _httpClient.Timeout = TimeSpan.FromSeconds(timeout);
+    }
+
+    public async Task<User> GetUserAsync(int userId)
+    {
+        var baseUrl = _configuration["ApiSettings:BaseUrl"];
+        var apiUrl = $"{baseUrl}/users/{userId}";
+        var response = await _httpClient.GetAsync(apiUrl);
+        return await response.Content.ReadFromJsonAsync<User>();
+    }
+}
+
+public class DatabaseHelper
+{
+    private readonly IConfiguration _configuration;
+
+    public DatabaseHelper(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
+    public SqlConnection GetConnection()
+    {
+        var connectionString = _configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("연결 문자열이 설정되지 않았습니다.");
+        return new SqlConnection(connectionString);
+    }
+}"""
         }
     ]
 
@@ -249,6 +323,7 @@ public class UserService
             'security': ReviewCategory.SECURITY,
             'naming_convention': ReviewCategory.NAMING_CONVENTION,
             'code_documentation': ReviewCategory.CODE_DOCUMENTATION,
+            'hardcoding_to_config': ReviewCategory.HARDCODING_TO_CONFIG,
         }
 
         for key, enum_value in category_map.items():
@@ -274,6 +349,7 @@ public class UserService
             'security': ReviewCategory.SECURITY,
             'naming_convention': ReviewCategory.NAMING_CONVENTION,
             'code_documentation': ReviewCategory.CODE_DOCUMENTATION,
+            'hardcoding_to_config': ReviewCategory.HARDCODING_TO_CONFIG,
         }
 
         for key, enum_value in category_map.items():

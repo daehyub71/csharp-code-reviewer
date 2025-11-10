@@ -6,12 +6,13 @@ This module provides the main application window with menu bar, toolbar, and sta
 
 import sys
 from pathlib import Path
+from typing import List
 
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QMenuBar, QMenu, QToolBar, QStatusBar, QPushButton,
     QLabel, QMessageBox, QFileDialog, QProgressDialog, QSplitter,
-    QTabWidget
+    QTabWidget, QApplication
 )
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtGui import QAction, QKeySequence, QIcon
@@ -1262,8 +1263,6 @@ class MainWindow(QMainWindow):
 
 # Test the main window
 if __name__ == "__main__":
-    from PySide6.QtWidgets import QApplication
-
     app = QApplication(sys.argv)
 
     window = MainWindow()
