@@ -693,32 +693,74 @@ public ReturnType MethodName(Type param1, Type param2) { ... }
 
 ### Week 5: 포터블 패키징 (Day 16-18)
 
-#### Day 16 (2025-01-23): PyInstaller EXE 빌드
+#### Day 16 (2025-01-23): PyInstaller EXE 빌드 ✅
 **목표**: Python 스크립트를 단일 EXE로 패키징
 
 **Tasks**:
-- [ ] PyInstaller 설정
-  - [ ] `pip install pyinstaller`
-  - [ ] spec 파일 생성 (`pyinstaller --name=CodeReviewer app/main.py`)
-- [ ] spec 파일 수정
-  - [ ] --onefile 옵션 (단일 EXE)
-  - [ ] --windowed 옵션 (콘솔 숨김)
-  - [ ] --icon 옵션 (아이콘 설정)
-  - [ ] --add-data (리소스 파일 포함)
-  - [ ] --exclude-module (불필요 모듈 제외)
-- [ ] 빌드 스크립트 작성
-  - [ ] scripts/build_exe.py
-  - [ ] UPX 압축 (선택적)
-  - [ ] 서명 (선택적)
-- [ ] 테스트
-  - [ ] EXE 실행 확인
-  - [ ] 의존성 누락 확인
-  - [ ] 에러 로그 확인
+- [x] PyInstaller 설정
+  - [x] `pip install pyinstaller` (requirements.txt에 포함)
+  - [x] spec 파일 생성 (`CodeReviewer.spec`)
+- [x] spec 파일 수정
+  - [x] --onefile 옵션 (단일 EXE)
+  - [x] --windowed 옵션 (콘솔 숨김)
+  - [x] --icon 옵션 (TODO로 표시, 향후 추가 예정)
+  - [x] --add-data (리소스 파일 포함: styles, templates)
+  - [x] --exclude-module (불필요 모듈 제외: tkinter, tests, PIL, scipy, pandas)
+- [x] 빌드 스크립트 작성
+  - [x] scripts/build_exe.py (213줄)
+  - [x] UPX 압축 활성화 (upx=True)
+  - [x] 서명 (TODO로 표시, 향후 추가 예정)
+- [x] 테스트 스크립트
+  - [x] scripts/test_exe.py (171줄)
+  - [x] 4가지 테스트 (파일 존재, Ollama 체크, 리소스 확인, 실행 테스트)
+- [x] 문서화
+  - [x] docs/BUILD_GUIDE.md (345줄 - 빌드 가이드)
 
 **산출물**:
-- CodeReviewer.exe 생성 (약 50-100MB)
-- 빌드 스크립트 완성
-- 실행 테스트 통과
+- ✅ `CodeReviewer.spec` - PyInstaller 설정 파일 (87줄)
+  - PySide6, matplotlib, ollama 등 hiddenimports 설정
+  - 리소스 파일 번들링 설정
+  - UPX 압축 활성화
+  - console=False (GUI 모드)
+- ✅ `scripts/build_exe.py` - 자동화 빌드 스크립트 (213줄)
+  - 사전 체크 (spec 파일, entry point, 리소스 존재 확인)
+  - 빌드 아티팩트 정리 (--clean 옵션)
+  - PyInstaller 실행
+  - 사후 검증 (EXE 파일, 크기 확인)
+- ✅ `scripts/test_exe.py` - EXE 테스트 스크립트 (171줄)
+  - 파일 존재 및 크기 확인
+  - Ollama 서버 접근 확인
+  - 리소스 번들 확인
+  - EXE 실행 테스트
+- ✅ `docs/BUILD_GUIDE.md` - 빌드 가이드 문서 (345줄)
+  - 빌드 전 체크리스트
+  - 빌드 프로세스 설명
+  - 트러블슈팅 가이드
+  - 최적화 팁
+  - 배포 가이드
+
+**빌드 사용법**:
+```bash
+# 기본 빌드
+python scripts/build_exe.py
+
+# 클린 빌드 (이전 빌드 아티팩트 삭제 후)
+python scripts/build_exe.py --clean
+
+# 디버그 빌드 (콘솔 창 표시)
+python scripts/build_exe.py --debug
+
+# EXE 테스트
+python scripts/test_exe.py
+```
+
+**예상 EXE 크기**:
+- 압축 전: ~100-150 MB
+- UPX 압축 후: ~50-100 MB
+
+**다음 단계**: Day 17 - Ollama 포터블 번들링
+
+**마지막 업데이트**: 2025-01-19
 
 ---
 
