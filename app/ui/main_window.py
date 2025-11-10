@@ -654,7 +654,8 @@ class MainWindow(QMainWindow):
                 ReviewCategory.PERFORMANCE,
                 ReviewCategory.SECURITY,
                 ReviewCategory.NAMING_CONVENTION,
-                ReviewCategory.CODE_DOCUMENTATION
+                ReviewCategory.CODE_DOCUMENTATION,
+                ReviewCategory.HARDCODING_TO_CONFIG
             ]
 
             # 프롬프트 생성
