@@ -318,17 +318,39 @@ LLM이 코드를 생성하는 과정을 실시간으로 확인할 수 있습니�
 
 ### 4. 플로우 다이어그램 (Mermaid → PNG)
 
+코드 분석 과정을 시각화한 플로우 다이어그램을 자동 생성합니다:
+
 ```mermaid
 graph TD
-    A[Start] --> B{User != null?}
-    B -->|No| C[Return false]
-    B -->|Yes| D{Role == Admin?}
-    D -->|Yes| E[Return true]
-    D -->|No| F[Check Permissions]
-    F --> G[Return result]
+    A[C# 코드 입력] --> B[Ollama 서버 체크]
+    B -->|실행 중| C[LLM 분석 시작]
+    B -->|미실행| D[Ollama 자동 시작]
+    D --> C
+    C --> E{8가지 카테고리 검사}
+    E --> F[Null 참조]
+    E --> G[Exception 처리]
+    E --> H[리소스 관리]
+    E --> I[성능 최적화]
+    E --> J[보안]
+    E --> K[네이밍 컨벤션]
+    E --> L[XML 문서 주석]
+    E --> M[하드코딩→Config]
+    F --> N[개선 코드 생성]
+    G --> N
+    H --> N
+    I --> N
+    J --> N
+    K --> N
+    L --> N
+    M --> N
+    N --> O[리포트 생성]
+    O --> P[Markdown + HTML 저장]
+    P --> Q[완료]
 ```
 
 자동으로 PNG 이미지로 변환하여 리포트에 포함합니다.
+
+**실제 출력 예시**: 코드의 실행 흐름, 조건 분기, 에러 처리 등을 시각화
 
 ### 5. 통합 리포트 (프로젝트 전체 분석)
 
