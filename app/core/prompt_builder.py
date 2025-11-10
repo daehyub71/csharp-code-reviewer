@@ -3,10 +3,19 @@ C# 코드 리뷰를 위한 프롬프트 빌더
 
 이 모듈은 LLM에 전달할 프롬프트를 생성하고 최적화합니다.
 토큰 수를 최소화하면서 효과적인 코드 리뷰를 수행합니다.
+
+리뷰 규칙과 예제는 Markdown 파일에서 동적으로 로드됩니다.
 """
 
 from typing import List, Dict, Any
 from enum import Enum
+from pathlib import Path
+import sys
+
+# 프로젝트 루트 경로 추가
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+from app.utils.markdown_parser import CategoryLoader
 
 
 class ReviewCategory(Enum):
@@ -17,6 +26,7 @@ class ReviewCategory(Enum):
     PERFORMANCE = "performance"  # 성능 이슈
     SECURITY = "security"  # 보안 취약점
     NAMING_CONVENTION = "naming_convention"  # 네이밍 컨벤션
+    CODE_DOCUMENTATION = "code_documentation"  # XML 문서 주석
 
 
 class OutputFormat(Enum):
@@ -101,6 +111,19 @@ class PromptBuilder:
                 "_camelCase: private 필드",
                 "의미 있는 이름 사용"
             ]
+        },
+        ReviewCategory.CODE_DOCUMENTATION: {
+            "name": "XML 문서 주석",
+            "description": "C# XML 문서 주석 작성 (///, <summary>, <param>, <returns> 등)",
+            "rules": [
+                "모든 public 클래스/메서드에 /// 주석 추가",
+                "<summary>: 한 줄 요약",
+                "<param>: 매개변수 설명",
+                "<returns>: 반환값 설명",
+                "<exception>: 발생 가능한 예외",
+                "<remarks>: 상세 설명 (옵션)",
+                "<example>: 사용 예제 (옵션)"
+            ]
         }
     }
 
@@ -152,12 +175,120 @@ class PromptBuilder:
 
     return a / b;
 }"""
+        },
+        {
+            "category": ReviewCategory.CODE_DOCUMENTATION,
+            "before": """public class UserService
+{
+    public User GetUser(int userId)
+    {
+        return database.Find(userId);
+    }
+}""",
+            "after": """/// <summary>
+/// 사용자 관리 서비스
+/// </summary>
+/// <remarks>
+/// 데이터베이스에서 사용자 정보를 조회하고 관리합니다.
+/// </remarks>
+public class UserService
+{
+    /// <summary>
+    /// 사용자 ID로 사용자 정보를 조회합니다.
+    /// </summary>
+    /// <param name="userId">조회할 사용자 ID</param>
+    /// <returns>사용자 정보 객체, 없으면 null</returns>
+    /// <exception cref="ArgumentException">userId가 0 이하인 경우</exception>
+    public User GetUser(int userId)
+    {
+        if (userId <= 0)
+            throw new ArgumentException("유효하지 않은 사용자 ID입니다.", nameof(userId));
+
+        return database.Find(userId);
+    }
+}"""
         }
     ]
 
-    def __init__(self):
-        """PromptBuilder 초기화"""
+    def __init__(self, use_markdown=True):
+        """
+        PromptBuilder 초기화
+
+        Args:
+            use_markdown: Markdown 파일에서 규칙/예제 로드 여부 (기본값: True)
+        """
         self.system_prompt = self.SYSTEM_PROMPT
+
+        if use_markdown:
+            # Markdown 파일에서 카테고리 데이터 로드
+            project_root = Path(__file__).parent.parent.parent
+            categories_dir = project_root / "resources" / "templates" / "review_categories"
+
+            loader = CategoryLoader(categories_dir)
+            self.categories_data = loader.load_all()
+
+            # REVIEW_TEMPLATES 동적 생성
+            self.review_templates = self._build_templates_from_markdown()
+
+            # FEW_SHOT_EXAMPLES 동적 생성
+            self.few_shot_examples = self._build_examples_from_markdown()
+        else:
+            # 기존 하드코딩된 데이터 사용 (하위 호환성)
+            self.review_templates = self.REVIEW_TEMPLATES
+            self.few_shot_examples = self.FEW_SHOT_EXAMPLES
+
+    def _build_templates_from_markdown(self) -> Dict:
+        """Markdown 데이터에서 REVIEW_TEMPLATES 형식으로 변환"""
+        templates = {}
+
+        category_map = {
+            'null_reference': ReviewCategory.NULL_REFERENCE,
+            'exception_handling': ReviewCategory.EXCEPTION_HANDLING,
+            'resource_management': ReviewCategory.RESOURCE_MANAGEMENT,
+            'performance': ReviewCategory.PERFORMANCE,
+            'security': ReviewCategory.SECURITY,
+            'naming_convention': ReviewCategory.NAMING_CONVENTION,
+            'code_documentation': ReviewCategory.CODE_DOCUMENTATION,
+        }
+
+        for key, enum_value in category_map.items():
+            if key in self.categories_data:
+                data = self.categories_data[key]
+                templates[enum_value] = {
+                    'name': data['name'],
+                    'description': data['description'],
+                    'rules': data['rules']
+                }
+
+        return templates
+
+    def _build_examples_from_markdown(self) -> List[Dict]:
+        """Markdown 데이터에서 FEW_SHOT_EXAMPLES 형식으로 변환"""
+        examples = []
+
+        category_map = {
+            'null_reference': ReviewCategory.NULL_REFERENCE,
+            'exception_handling': ReviewCategory.EXCEPTION_HANDLING,
+            'resource_management': ReviewCategory.RESOURCE_MANAGEMENT,
+            'performance': ReviewCategory.PERFORMANCE,
+            'security': ReviewCategory.SECURITY,
+            'naming_convention': ReviewCategory.NAMING_CONVENTION,
+            'code_documentation': ReviewCategory.CODE_DOCUMENTATION,
+        }
+
+        for key, enum_value in category_map.items():
+            if key in self.categories_data:
+                data = self.categories_data[key]
+                # 각 카테고리의 첫 번째 예제만 사용 (토큰 최적화)
+                if data['examples']:
+                    first_example = data['examples'][0]
+                    examples.append({
+                        'category': enum_value,
+                        'before': first_example['before'],
+                        'after': first_example['after']
+                    })
+
+        return examples
 
     def build_review_prompt(
         self,
@@ -184,20 +315,20 @@ class PromptBuilder:
         if categories:
             prompt_parts.append("다음 항목을 중점적으로 검토하세요:")
             for category in categories:
-                template = self.REVIEW_TEMPLATES[category]
+                template = self.review_templates[category]
                 prompt_parts.append(f"\n• {template['name']}: {template['description']}")
 
         # 2. Few-shot 예제 (선택한 카테고리만)
         if include_examples and categories:
             relevant_examples = [
-                ex for ex in self.FEW_SHOT_EXAMPLES
+                ex for ex in self.few_shot_examples
                 if ex["category"] in categories
             ]
 
             if relevant_examples:
                 prompt_parts.append("\n\n예제:")
                 for i, example in enumerate(relevant_examples[:2], 1):  # 최대 2개만
-                    category_name = self.REVIEW_TEMPLATES[example["category"]]["name"]
+                    category_name = self.review_templates[example["category"]]["name"]
                     prompt_parts.append(f"\n[{category_name}]")
                     prompt_parts.append(f"Before:\n{example['before']}")
                     prompt_parts.append(f"\nAfter:\n{example['after']}\n")

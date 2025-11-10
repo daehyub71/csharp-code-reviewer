@@ -248,31 +248,36 @@
 **목표**: Markdown을 HTML로 변환하여 표시
 
 **Tasks**:
-- [ ] `app/utils/markdown_renderer.py` 구현
-  - [ ] python-markdown 라이브러리 사용
-  - [ ] Extensions 설정
-    - fenced_code (코드 블록)
-    - tables (표)
-    - codehilite (코드 하이라이팅)
-  - [ ] Pygments 통합
-    - C# lexer 설정
-    - Monokai 색상 테마
-  - [ ] GitHub 스타일 CSS
-    - resources/styles/github_markdown.css
-- [ ] `app/ui/result_panel.py` 구현
-  - [ ] QTextBrowser 초기화
-  - [ ] HTML 설정 (setHtml)
-  - [ ] CSS 로드 및 적용
-  - [ ] 스크롤 위치 복원
-- [ ] 테스트
-  - [ ] 샘플 Markdown 렌더링 확인
-  - [ ] 코드 블록 하이라이팅 확인
-  - [ ] 표 및 링크 동작 확인
+- ✅ `app/utils/markdown_renderer.py` 구현
+  - ✅ python-markdown 라이브러리 사용
+  - ✅ Extensions 설정
+    - ✅ fenced_code (코드 블록)
+    - ✅ tables (표)
+    - ✅ codehilite (코드 하이라이팅)
+  - ✅ Pygments 통합
+    - ✅ C# lexer 설정
+    - ✅ Monokai 색상 테마
+  - ✅ GitHub 스타일 CSS
+    - ✅ resources/styles/github_markdown.css
+- ✅ `app/ui/result_panel.py` 구현
+  - ✅ QTextBrowser 초기화
+  - ✅ HTML 설정 (setHtml)
+  - ✅ CSS 로드 및 적용
+  - ✅ 스크롤 위치 복원
+  - ✅ 툴바 기능 (확대/축소, 스크롤 이동)
+- ✅ 테스트
+  - ✅ 샘플 Markdown 렌더링 확인
+  - ✅ 코드 블록 하이라이팅 확인 (Pygments Monokai 테마)
+  - ✅ 표 및 링크 동작 확인
+  - ✅ ReportGenerator 통합 테스트
 
 **산출물**:
-- Markdown → HTML 렌더러 완성
-- QTextBrowser 결과 패널 완성
-- GitHub 스타일 적용 확인
+- Markdown → HTML 렌더러 완성 (308줄)
+- QTextBrowser 결과 패널 완성 (268줄)
+- GitHub Dark 스타일 CSS 완성
+- 종합 테스트 스크립트 (test_markdown_rendering.py)
+
+**완료일**: 2025-01-14
 
 ---
 
@@ -280,124 +285,305 @@
 **목표**: 플로우 다이어그램 시각화
 
 **Tasks**:
-- [ ] Mermaid CLI 설치
-  - [ ] npm install -g @mermaid-js/mermaid-cli
-  - [ ] mmdc 명령어 확인
-- [ ] `app/core/diagram_converter.py` 구현
-  - [ ] Mermaid 코드 추출 (Markdown에서)
-  - [ ] 임시 .mmd 파일 생성
-  - [ ] mmdc 명령어 실행 (subprocess)
-  - [ ] PNG 이미지 생성
-  - [ ] 이미지 Base64 인코딩
-  - [ ] Markdown에 이미지 삽입 (<img src="data:image/png;base64,...">)
-- [ ] 에러 처리
-  - [ ] mmdc 실행 실패 시 텍스트 폴백
-  - [ ] 타임아웃 설정 (10초)
-- [ ] 테스트
-  - [ ] 간단한 플로우차트 생성 확인
-  - [ ] 복잡한 다이어그램 테스트
+- ✅ Mermaid CLI 설치
+  - ✅ npm install -g @mermaid-js/mermaid-cli (v11.12.0)
+  - ✅ mmdc 명령어 확인
+- ✅ `app/core/diagram_converter.py` 구현
+  - ✅ Mermaid 코드 추출 (Markdown에서)
+  - ✅ 임시 .mmd 파일 생성
+  - ✅ mmdc 명령어 실행 (subprocess)
+  - ✅ PNG 이미지 생성
+  - ✅ 이미지 Base64 인코딩
+  - ✅ Markdown에 이미지 삽입 (<img src="data:image/png;base64,...">)
+- ✅ 에러 처리
+  - ✅ mmdc 실행 실패 시 텍스트 폴백
+  - ✅ 타임아웃 설정 (10초)
+- ✅ 테스트
+  - ✅ 간단한 플로우차트 생성 확인
+  - ✅ 복잡한 다이어그램 테스트 (시퀀스, 클래스 다이어그램)
+  - ✅ 에러 처리 테스트 (잘못된 문법)
+- ✅ MainWindow 통합
+  - ✅ ResultPanel 추가 (QSplitter로 레이아웃)
+  - ✅ 리포트 자동 생성 및 표시
 
 **산출물**:
-- Mermaid → PNG 변환기 완성
-- 다이어그램 표시 확인
-- 에러 핸들링 구현
+- Mermaid → PNG 변환기 완성 (243줄)
+- 다이어그램 표시 확인 (Base64 임베딩)
+- 에러 핸들링 구현 (폴백 처리)
+- 종합 테스트 스크립트 (test_diagram_converter.py, 6개 테스트 모두 통과)
+- MainWindow에 ResultPanel 통합
+
+**완료일**: 2025-01-15
 
 ---
 
-### Week 3: 파일 업로드 모드 (Day 9-11)
+#### Day 8.5 (2025-01-15): XML 문서 주석 자동 생성
+**목표**: C# XML 문서 주석 자동 생성 기능 추가
 
-#### Day 9 (2025-01-16): 파일 선택 UI 및 드래그 앤 드롭
+**Tasks**:
+- ✅ ReviewCategory에 CODE_DOCUMENTATION 추가
+- ✅ PromptBuilder에 XML 주석 규칙 추가
+  - ✅ `<summary>`: 한 줄 요약
+  - ✅ `<param>`: 매개변수 설명
+  - ✅ `<returns>`: 반환값 설명
+  - ✅ `<exception>`: 발생 가능한 예외
+  - ✅ `<remarks>`: 상세 설명 (옵션)
+  - ✅ `<example>`: 사용 예제 (옵션)
+- ✅ Few-shot 예제 추가
+  - ✅ 클래스 주석 예제
+  - ✅ 메서드 주석 예제
+- ✅ MainWindow categories에 CODE_DOCUMENTATION 추가
+- ✅ ReportGenerator에 카테고리 이름 추가
+
+**XML 주석 템플릿**:
+```csharp
+/// <summary>
+/// TODO: 한 줄 요약 — 이 메서드가 하는 일
+/// </summary>
+/// <param name="param1">TODO: param1 설명</param>
+/// <param name="param2">TODO: param2 설명 (옵션/범위 등)</param>
+/// <returns>TODO: 반환값 설명</returns>
+/// <exception cref="ArgumentNullException">param1이 null인 경우</exception>
+/// <remarks>
+/// TODO: 상세 설명 (부작용, 복잡도, 참고할 점 등)
+/// </remarks>
+public ReturnType MethodName(Type param1, Type param2) { ... }
+```
+
+**산출물**:
+- 7번째 리뷰 카테고리 추가 (총 7개)
+- XML 문서 주석 자동 생성 기능
+- Few-shot 예제 (UserService 클래스)
+
+**완료일**: 2025-01-15
+
+---
+
+#### Day 9 (2025-01-16): Markdown 기반 리뷰 규칙 관리 시스템
+**목표**: 리뷰 규칙을 Markdown 파일로 외부화하여 유지보수성 향상
+
+**Tasks**:
+- ✅ Markdown 파일 기반 카테고리 시스템 설계
+  - ✅ `resources/templates/review_categories/` 디렉토리 생성
+  - ✅ 7개 카테고리 Markdown 파일 작성
+    - ✅ `code_documentation.md` (8가지 케이스: 클래스, 메서드, 프로퍼티, 인터페이스, Enum, Delegate, Event, Generic)
+    - ✅ `null_reference.md` (Null 참조 체크)
+    - ✅ `exception_handling.md` (Exception 처리)
+    - ✅ `resource_management.md` (리소스 관리)
+    - ✅ `performance.md` (성능 최적화)
+    - ✅ `security.md` (보안)
+    - ✅ `naming_convention.md` (네이밍 컨벤션)
+- ✅ `app/utils/markdown_parser.py` 구현 (231줄)
+  - ✅ `ReviewCategoryParser` 클래스
+    - ✅ `_extract_title()`: # 제목 추출
+    - ✅ `_extract_description()`: ## 설명 섹션 추출
+    - ✅ `_extract_rules()`: ## 규칙 리스트 추출
+    - ✅ `_extract_examples()`: Before/After 예제 추출
+  - ✅ `CategoryLoader` 클래스
+    - ✅ `load_all()`: 모든 카테고리 파일 로드
+    - ✅ `load_category()`: 특정 카테고리 파일 로드
+- ✅ `app/core/prompt_builder.py` 리팩토링
+  - ✅ `__init__(use_markdown=True)` 파라미터 추가
+  - ✅ `_build_templates_from_markdown()` 메서드 추가
+  - ✅ `_build_examples_from_markdown()` 메서드 추가
+  - ✅ `build_review_prompt()` 메서드 수정 (동적 템플릿 사용)
+  - ✅ 하드코딩 모드 호환성 유지 (use_markdown=False)
+- ✅ 통합 테스트
+  - ✅ test_markdown_integration.py 작성
+  - ✅ 7개 카테고리 로드 확인
+  - ✅ 프롬프트 생성 테스트 (1967자)
+  - ✅ 하드코딩 모드 호환성 테스트
+
+**Markdown 파일 구조**:
+```markdown
+# 카테고리 이름
+
+## 설명
+카테고리 설명 텍스트
+
+## 규칙
+- 규칙 1
+- 규칙 2
+- 규칙 3
+
+## Before 예제
+```csharp
+// 개선 전 코드
+```
+
+## After 예제
+```csharp
+// 개선 후 코드
+```
+```
+
+**산출물**:
+- 7개 Markdown 카테고리 파일 (총 50개 이상의 규칙, 8개 예제 케이스)
+- Markdown 파서 구현 (231줄)
+- PromptBuilder 동적 로딩 시스템
+- 통합 테스트 스크립트 (모든 테스트 통과)
+
+**주요 개선 사항**:
+- ✅ **유지보수성**: 리뷰 규칙을 코드 수정 없이 Markdown 파일로 관리
+- ✅ **확장성**: 새로운 케이스 추가 시 Markdown 파일만 수정
+- ✅ **가독성**: 규칙과 예제를 구조화된 형식으로 관리
+- ✅ **협업**: 비개발자도 Markdown 파일 편집 가능
+- ✅ **버전 관리**: Markdown diff로 규칙 변경 이력 추적 용이
+
+**완료일**: 2025-01-16
+
+---
+
+### Week 3: 파일 업로드 모드 (Day 10-12)
+
+#### Day 10 (2025-01-17): 파일 선택 UI 및 드래그 앤 드롭
 **목표**: 파일 업로드 인터페이스 구현
 
 **Tasks**:
-- [ ] `app/ui/file_upload_widget.py` 구현
-  - [ ] QListWidget (파일 목록 표시)
-  - [ ] "파일 추가" 버튼 (QFileDialog)
-  - [ ] "선택 제거" 버튼
-  - [ ] 파일 카운터 (총 N개 파일)
-- [ ] 드래그 앤 드롭 지원
-  - [ ] dragEnterEvent 오버라이드
-  - [ ] dropEvent 오버라이드
-  - [ ] `.cs` 파일만 필터링
-  - [ ] 드롭 영역 하이라이팅
-- [ ] 파일 검증
-  - [ ] 파일 존재 여부 확인
-  - [ ] 파일 크기 제한 (최대 1MB)
-  - [ ] UTF-8 인코딩 확인
-- [ ] UI 개선
-  - [ ] 파일 아이콘 표시
-  - [ ] 파일 크기 표시
-  - [ ] 더블클릭 시 미리보기
+- ✅ `app/ui/file_upload_widget.py` 구현 (600+ lines)
+  - ✅ QListWidget (파일 목록 표시)
+  - ✅ "파일 추가" 버튼 (QFileDialog)
+  - ✅ "선택 제거" / "전체 제거" 버튼
+  - ✅ 파일 카운터 (총 N개 파일)
+- ✅ 드래그 앤 드롭 지원
+  - ✅ dragEnterEvent 오버라이드
+  - ✅ dropEvent 오버라이드
+  - ✅ `.cs` 파일만 필터링
+  - ✅ 드롭 영역 하이라이팅 (파란색 강조)
+- ✅ 파일 검증
+  - ✅ 파일 존재 여부 확인
+  - ✅ 파일 크기 제한 (최대 1MB)
+  - ✅ UTF-8 인코딩 확인
+  - ✅ 중복 파일 체크
+- ✅ UI 개선
+  - ✅ 파일 아이콘 표시 (📄)
+  - ✅ 파일 크기 표시 (자동 포맷팅: B/KB/MB/GB)
+  - ✅ 더블클릭 시 미리보기 (FilePreviewDialog)
+  - ✅ 툴팁에 전체 경로 표시
+  - ✅ VS Code Dark 테마 스타일
+- ✅ MainWindow 통합
+  - ✅ QTabWidget으로 "텍스트 입력" / "파일 업로드" 모드 전환
+  - ✅ Import 추가 및 레이아웃 수정
+- ✅ 테스트
+  - ✅ tests/test_file_upload_widget.py 작성 (13개 테스트)
+  - ✅ 단위 테스트 (FileUploadWidget, FileListWidget)
+  - ✅ 통합 테스트 (전체 워크플로우)
+  - ✅ 모든 테스트 통과 (13/13)
 
 **산출물**:
-- 파일 업로드 위젯 완성
-- 드래그 앤 드롭 동작 확인
-- 파일 검증 로직 구현
+- ✅ FileUploadWidget 완성 (600+ lines)
+  - FileListWidget: 드래그 앤 드롭 지원 리스트
+  - FilePreviewDialog: 파일 미리보기 다이얼로그
+  - 파일 검증 로직 (크기, 인코딩, 확장자)
+- ✅ MainWindow 탭 통합
+- ✅ 13개 단위/통합 테스트 (100% 통과)
+- ✅ 테스트용 C# 파일 3개 (test_files/)
+
+**주요 기능**:
+- 📂 **파일 추가**: QFileDialog 또는 드래그 앤 드롭
+- 🗑️ **파일 제거**: 선택 제거 / 전체 제거
+- 🔍 **파일 검증**: .cs 확장자, 1MB 이하, UTF-8 인코딩
+- 📄 **파일 미리보기**: 더블클릭으로 코드 내용 확인
+- 🎨 **UX**: 파일 크기 표시, 드래그 시 배경 강조, 플레이스홀더
+
+**완료일**: 2025-01-17
 
 ---
 
-#### Day 10 (2025-01-17): 다중 파일 분석 및 프로그레스바
+#### Day 11 (2025-01-18): 다중 파일 분석 및 프로그레스바 ✅
 **목표**: 여러 파일 순차 분석 및 진행 상태 표시
 
 **Tasks**:
-- [ ] 다중 파일 분석 로직
-  - [ ] 파일 목록 순회
-  - [ ] 각 파일 읽기 (UTF-8)
-  - [ ] LLM 호출 (파일별)
-  - [ ] After 코드 및 리포트 생성
-- [ ] 프로그레스 다이얼로그
-  - [ ] QProgressDialog 사용
-  - [ ] 진행률 표시 (N/M 파일)
-  - [ ] 현재 파일명 표시
-  - [ ] "취소" 버튼 (분석 중단)
-- [ ] 에러 복구
-  - [ ] 파일 읽기 실패 시 스킵
-  - [ ] LLM 오류 시 재시도 (최대 3회)
-  - [ ] 에러 로그 기록
-- [ ] 결과 집계
-  - [ ] 성공/실패 파일 개수
-  - [ ] 총 소요 시간
-  - [ ] 요약 다이얼로그 표시
+- [x] 다중 파일 분석 로직
+  - [x] 파일 목록 순회
+  - [x] 각 파일 읽기 (UTF-8)
+  - [x] LLM 호출 (파일별)
+  - [x] After 코드 및 리포트 생성
+- [x] 프로그레스 다이얼로그
+  - [x] QProgressDialog 사용
+  - [x] 진행률 표시 (N/M 파일)
+  - [x] 현재 파일명 표시
+  - [x] "취소" 버튼 (분석 중단)
+- [x] 에러 복구
+  - [x] 파일 읽기 실패 시 스킵
+  - [x] LLM 오류 시 재시도 (최대 3회, 1초 간격)
+  - [x] 에러 로그 기록 (콘솔 출력)
+- [x] 결과 집계
+  - [x] 성공/실패/건너뜀 파일 개수
+  - [x] 총 소요 시간
+  - [x] 요약 다이얼로그 표시 (파일별 상세 결과 포함)
+  - [x] 성공 결과 일괄 저장 기능
 
 **산출물**:
-- 다중 파일 분석 엔진 완성
-- 프로그레스바 동작 확인
-- 에러 복구 로직 테스트
+- ✅ `app/core/batch_analyzer.py` - BatchAnalyzer 클래스 (320줄)
+  - FileAnalysisResult, BatchAnalysisResult 데이터클래스
+  - 재시도 로직 (MAX_RETRIES=3), 에러 복구, 진행률 콜백
+- ✅ `app/ui/main_window.py` - 다중 파일 분석 통합
+  - `_analyze_multiple_files()` 메서드 (106줄)
+  - `_show_batch_results_dialog()` 메서드 (73줄)
+  - `_save_batch_results()` 메서드 (63줄)
+- ✅ `tests/test_batch_analyzer.py` - 단위 테스트 (345줄)
+  - 10개 테스트 케이스 (모두 통과)
+  - 재시도 로직, 취소 기능, 프로그레스 콜백 검증
+
+**마지막 업데이트**: 2025-01-18
 
 ---
 
-#### Day 11 (2025-01-18): 파일별 리포트 생성 및 관리
+#### Day 12 (2025-01-19): 파일별 리포트 생성 및 관리 ✅
 **목표**: 파일별 개별 리포트 저장 및 히스토리 관리
 
 **Tasks**:
-- [ ] 파일별 리포트 생성
-  - [ ] 파일명 기반 리포트명 ({파일명}_리뷰_{타임스탬프}.md)
-  - [ ] 자동 저장 경로 (./reports/)
-  - [ ] Markdown + HTML 동시 저장
-- [ ] 리포트 히스토리
-  - [ ] SQLite DB 생성 (reports.db)
-  - [ ] 테이블 스키마 (id, filename, timestamp, report_path)
-  - [ ] 리포트 목록 조회
-- [ ] 히스토리 UI
-  - [ ] "리포트 히스토리" 메뉴
-  - [ ] 파일별 리포트 목록 표시
-  - [ ] 더블클릭 시 리포트 열기
-  - [ ] 삭제 기능
-- [ ] 테스트
-  - [ ] 5개 파일 동시 분석
-  - [ ] 리포트 파일 생성 확인
-  - [ ] 히스토리 DB 쿼리 확인
+- [x] 파일별 리포트 생성
+  - [x] 파일명 기반 리포트명 ({파일명}_review_{YYYYMMDD_HHMMSS}.md)
+  - [x] 자동 저장 경로 (./reports/markdown/, ./reports/html/)
+  - [x] Markdown + HTML 동시 저장
+- [x] 리포트 히스토리
+  - [x] SQLite DB 생성 (reports/reports.db)
+  - [x] 테이블 스키마 (id, filename, report_name, timestamp, markdown_path, html_path, success, error_message, analysis_time)
+  - [x] 리포트 목록 조회 (get_all_reports, get_reports_by_filename, get_report_by_id)
+  - [x] 통계 조회 (get_statistics)
+- [x] 히스토리 UI
+  - [x] View 메뉴에 "📜 리포트 히스토리" 추가 (Ctrl+H)
+  - [x] QTableWidget으로 리포트 목록 표시 (ID, 파일명, 생성 시간, 상태, 분석 시간, 경로)
+  - [x] 더블클릭 시 HTML 리포트 브라우저에서 열기
+  - [x] 삭제 기능 (DB 레코드 + 파일)
+  - [x] 새로고침 버튼
+  - [x] 통계 정보 표시
+- [x] 자동 저장 통합
+  - [x] 단일 파일 분석 후 자동 저장
+  - [x] 배치 분석 후 성공한 파일들 자동 저장
+  - [x] 저장 결과 사용자에게 알림
+- [x] 테스트
+  - [x] ReportHistoryDB 테스트 (8개 테스트, 모두 통과)
+  - [x] ReportSaver 테스트 (8개 테스트, 모두 통과)
 
 **산출물**:
-- 파일별 리포트 저장 완성
-- 리포트 히스토리 DB 구현
-- 히스토리 UI 완성
+- ✅ `app/db/report_history.py` - ReportHistoryDB 클래스 (320줄)
+  - ReportRecord 데이터클래스
+  - CRUD 작업 (add, get, delete), 통계 조회
+- ✅ `app/services/report_saver.py` - ReportSaver 클래스 (240줄)
+  - save_report() 메서드 (MD + HTML 저장)
+  - Markdown → HTML 변환 (VS Code Dark 테마 스타일)
+  - 타임스탬프 기반 파일명 생성
+- ✅ `app/ui/main_window.py` - 자동 저장 및 히스토리 UI 통합
+  - ReportSaver 초기화
+  - 단일/배치 분석 후 자동 저장
+  - `_on_show_report_history()` 메서드 (163줄)
+- ✅ `tests/test_report_history.py` - 단위 테스트 (185줄)
+  - 8개 테스트 케이스 (모두 통과)
+- ✅ 디렉토리 구조:
+  - reports/markdown/ (Markdown 리포트 저장)
+  - reports/html/ (HTML 리포트 저장)
+  - reports/reports.db (SQLite 데이터베이스)
+
+**마지막 업데이트**: 2025-01-19
 
 ---
 
-### Week 4: 폴더 선택 모드 (Day 12-14)
+### Week 4: 폴더 선택 모드 (Day 13-15)
 
-#### Day 12 (2025-01-19): 트리 구조 UI 및 재귀 탐색
+#### Day 13 (2025-01-20): 트리 구조 UI 및 재귀 탐색
 **목표**: 폴더 구조를 트리로 표시
 
 **Tasks**:
@@ -426,7 +612,7 @@
 
 ---
 
-#### Day 13 (2025-01-20): 대용량 프로젝트 처리 및 배치 분석
+#### Day 14 (2025-01-21): 대용량 프로젝트 처리 및 배치 분석
 **목표**: 많은 파일을 효율적으로 처리
 
 **Tasks**:
@@ -452,7 +638,7 @@
 
 ---
 
-#### Day 14 (2025-01-21): 통합 리포트 및 Week 4 마무리
+#### Day 15 (2025-01-22): 통합 리포트 및 Week 4 마무리
 **목표**: 프로젝트 전체 요약 리포트 생성
 
 **Tasks**:
@@ -484,9 +670,9 @@
 
 ---
 
-### Week 5: 포터블 패키징 (Day 15-17)
+### Week 5: 포터블 패키징 (Day 16-18)
 
-#### Day 15 (2025-01-22): PyInstaller EXE 빌드
+#### Day 16 (2025-01-23): PyInstaller EXE 빌드
 **목표**: Python 스크립트를 단일 EXE로 패키징
 
 **Tasks**:
@@ -515,7 +701,7 @@
 
 ---
 
-#### Day 16 (2025-01-23): Ollama 포터블 번들링
+#### Day 17 (2025-01-24): Ollama 포터블 번들링
 **목표**: Ollama + Phi-3-mini를 포터블 패키지에 포함
 
 **Tasks**:
@@ -546,7 +732,7 @@
 
 ---
 
-#### Day 17 (2025-01-24): 설치 없는 실행 테스트 및 최적화
+#### Day 18 (2025-01-25): 설치 없는 실행 테스트 및 최적화
 **목표**: 완전한 포터블 패키지 검증
 
 **Tasks**:
@@ -588,9 +774,9 @@
 
 ---
 
-### Week 6: 테스트 및 최적화 (Day 18-21)
+### Week 6: 테스트 및 최적화 (Day 19-22)
 
-#### Day 18 (2025-01-25): 단위 테스트 (Pytest)
+#### Day 19 (2025-01-26): 단위 테스트 (Pytest)
 **목표**: 핵심 모듈 단위 테스트 작성
 
 **Tasks**:
@@ -621,7 +807,7 @@
 
 ---
 
-#### Day 19 (2025-01-26): 통합 테스트 및 VDI 환경 테스트
+#### Day 20 (2025-01-27): 통합 테스트 및 VDI 환경 테스트
 **목표**: 전체 워크플로우 통합 테스트
 
 **Tasks**:
@@ -650,7 +836,7 @@
 
 ---
 
-#### Day 20 (2025-01-27): 성능 최적화 및 메모리 관리
+#### Day 21 (2025-01-28): 성능 최적화 및 메모리 관리
 **목표**: 응답 속도 및 메모리 사용량 최적화
 
 **Tasks**:
@@ -678,7 +864,7 @@
 
 ---
 
-#### Day 21 (2025-01-28): 문서화 및 사용자 가이드 작성
+#### Day 22 (2025-01-29): 문서화 및 사용자 가이드 작성
 **목표**: 최종 문서 작성 및 프로젝트 완료
 
 **Tasks**:
@@ -718,11 +904,11 @@
 | 주차 | 기간 | 목표 | 완료 기준 |
 |------|------|------|-----------|
 | **Week 1** | Day 1-4 | 기본 구조 및 LLM 통합 | ✅ Ollama 연동, Before/After 에디터 동작 |
-| **Week 2** | Day 5-8 | 코드 분석 엔진 | ✅ 6가지 리뷰 항목, Markdown 리포트 생성 |
-| **Week 3** | Day 9-11 | 파일 업로드 모드 | ✅ 다중 파일 분석, 프로그레스바 |
-| **Week 4** | Day 12-14 | 폴더 선택 모드 | ✅ 트리 UI, 통합 리포트 |
-| **Week 5** | Day 15-17 | 포터블 패키징 | ✅ EXE + Ollama 번들, VDI 실행 |
-| **Week 6** | Day 18-21 | 테스트 및 문서화 | ✅ 단위 테스트 >80%, 사용자 가이드 |
+| **Week 2** | Day 5-9 | 코드 분석 엔진 + Markdown 관리 | ✅ 7가지 리뷰 항목, Markdown 리포트, 규칙 외부화 |
+| **Week 3** | Day 10-12 | 파일 업로드 모드 | 🔜 다중 파일 분석, 프로그레스바 |
+| **Week 4** | Day 13-15 | 폴더 선택 모드 | 🔜 트리 UI, 통합 리포트 |
+| **Week 5** | Day 16-18 | 포터블 패키징 | 🔜 EXE + Ollama 번들, VDI 실행 |
+| **Week 6** | Day 19-22 | 테스트 및 문서화 | 🔜 단위 테스트 >80%, 사용자 가이드 |
 
 ---
 
@@ -741,6 +927,6 @@
 
 ---
 
-**마지막 업데이트**: 2025-01-08
-**다음 리뷰**: Week 1 종료 후 (Day 4)
-**프로젝트 완료 목표**: 2025-02-18 (6주 후)
+**마지막 업데이트**: 2025-01-16
+**다음 리뷰**: Week 3 시작 전 (Day 10)
+**프로젝트 완료 목표**: 2025-02-19 (6주 후, Day 9 추가로 인한 +1일)

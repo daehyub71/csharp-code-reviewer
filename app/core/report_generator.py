@@ -141,7 +141,8 @@ class ReportGenerator:
             'resource_management': '리소스 관리',
             'performance': '성능 최적화',
             'security': '보안',
-            'naming_convention': '네이밍 컨벤션'
+            'naming_convention': '네이밍 컨벤션',
+            'code_documentation': 'XML 문서 주석'
         }
 
         items = [f"- ✅ **{category_names.get(cat, cat)}**" for cat in categories]
