@@ -669,25 +669,55 @@ class MainWindow(QMainWindow):
             full_prompt = f"{self.prompt_builder.SYSTEM_PROMPT}\n\n{prompt}"
 
             # Step 2: LLM 분석 (30%)
-            progress.setLabelText("AI 분석 중... (Phi-3-mini)")
+            progress.setLabelText("AI 분석 중... (실시간 생성)")
             progress.setValue(30)
 
             if progress.wasCanceled():
                 self.statusBar().showMessage("분석이 취소되었습니다.", 3000)
                 return
 
-            # Ollama로 코드 분석 (스트리밍 비활성화)
-            improved_code = self.ollama_client.analyze_code(
-                prompt=full_prompt,
-                stream=False
-            )
+            # Ollama로 코드 분석 (스트리밍 활성화)
+            improved_code = ""
+            token_count = 0
+
+            try:
+                # Generator를 받아서 토큰 단위로 실시간 처리
+                for token in self.ollama_client.analyze_code(
+                    prompt=full_prompt,
+                    stream=True  # 스트리밍 활성화
+                ):
+                    improved_code += token
+                    token_count += 1
+
+                    # 50 토큰마다 UI 업데이트 (과도한 업데이트 방지)
+                    if token_count % 50 == 0:
+                        self.editor.set_after_text(improved_code)
+                        progress.setLabelText(
+                            f"AI 분석 중... ({token_count} tokens 생성됨)"
+                        )
+                        QApplication.processEvents()  # UI 업데이트
+
+                    # 취소 체크
+                    if progress.wasCanceled():
+                        self.statusBar().showMessage("분석이 취소되었습니다.", 3000)
+                        return
+
+                # 최종 업데이트
+                self.editor.set_after_text(improved_code)
+
+            except Exception as e:
+                progress.close()
+                QMessageBox.critical(
+                    self,
+                    "분석 오류",
+                    f"코드 분석 중 오류가 발생했습니다:\n\n{str(e)}"
+                )
+                self.statusBar().showMessage("분석 실패", 5000)
+                return
 
             # Step 3: 결과 처리 (80%)
             progress.setLabelText("결과 처리 중...")
             progress.setValue(80)
-
-            # 결과를 After 에디터에 표시
-            self.editor.set_after_text(improved_code)
 
             # 파일 모드인 경우 Before 에디터에도 원본 코드 표시 (비교를 위해)
             if source_type == "file":

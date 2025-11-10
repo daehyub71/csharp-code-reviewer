@@ -207,11 +207,13 @@ class BatchAnalyzer:
 
                 full_prompt = f"{self.prompt_builder.SYSTEM_PROMPT}\n\n{prompt}"
 
-                # LLM 호출
-                improved_code = self.ollama_client.analyze_code(
+                # LLM 호출 (스트리밍 활성화)
+                improved_code = ""
+                for token in self.ollama_client.analyze_code(
                     prompt=full_prompt,
-                    stream=False
-                )
+                    stream=True  # 스트리밍 활성화 (토큰 제한 완화)
+                ):
+                    improved_code += token
 
                 # 리포트 생성
                 report_markdown = self.report_generator.generate_report(
