@@ -11,7 +11,7 @@
 
 ## 프로젝트 소개
 
-**C# Code Reviewer**는 폐쇄망 VDI 환경에서 완전히 오프라인으로 동작하는 AI 기반 코드 리뷰 도구입니다. Microsoft의 경량 LLM인 **Phi-3-mini**를 활용하여 6가지 핵심 리뷰 항목을 자동으로 분석하고, 개선 코드를 제안합니다.
+**C# Code Reviewer**는 폐쇄망 VDI 환경에서 완전히 오프라인으로 동작하는 AI 기반 코드 리뷰 도구입니다. Microsoft의 경량 LLM인 **Phi-3-mini**를 활용하여 8가지 핵심 리뷰 항목을 자동으로 분석하고, 개선 코드를 제안합니다.
 
 ### 주요 특징
 
@@ -19,9 +19,11 @@
 - ✅ **관리자 권한 불필요**: 포터블 EXE 형태로 압축 해제 후 바로 실행
 - ✅ **AI 기반 리뷰**: Phi-3-mini LLM을 활용한 지능형 코드 분석
 - ✅ **8가지 리뷰 항목**: Null 참조, Exception, 리소스 관리, 성능, 보안, 네이밍 컨벤션, XML 문서 주석, 하드코딩→Config
-- ✅ **3가지 입력 모드**: 텍스트 입력, 파일 업로드 (드래그 앤 드롭), 폴더 선택
+- ✅ **3가지 입력 모드**: 텍스트 입력, 파일 업로드 (드래그 앤 드롭), 폴더 선택 (트리 구조)
 - ✅ **다중 파일 분석**: 배치 분석, 프로그레스바, 에러 복구 (최대 3회 재시도)
+- ✅ **통합 리포트**: 프로젝트 전체 통계, 카테고리별 분석, 우선순위 권장, 차트 생성
 - ✅ **리포트 자동 저장**: Markdown + HTML 동시 생성, SQLite DB 히스토리 관리
+- ✅ **자동 시작/종료**: Ollama 서버 자동 관리, 포터블 모드 지원, 백그라운드 실행
 - ✅ **사용자 친화적 GUI**: PySide6 네이티브 인터페이스 (탭 UI, VS Code Dark 테마)
 
 ---
@@ -167,7 +169,7 @@ CodeReviewer_Portable/
 
 ## 주요 기능
 
-### 1. 6가지 코드 리뷰 항목
+### 1. 8가지 코드 리뷰 항목
 
 #### 1) Null 참조 체크
 ```csharp
@@ -256,25 +258,63 @@ public class UserService  // PascalCase
 }
 ```
 
+#### 7) XML 문서 주석
+```csharp
+// ❌ 문제 (주석 없음)
+public bool ValidateUser(string name)
+{
+    return !string.IsNullOrEmpty(name);
+}
+
+// ✅ 개선
+/// <summary>
+/// 사용자 이름의 유효성을 검증합니다.
+/// </summary>
+/// <param name="name">검증할 사용자 이름</param>
+/// <returns>유효하면 true, 그렇지 않으면 false</returns>
+public bool ValidateUser(string name)
+{
+    return !string.IsNullOrEmpty(name);
+}
+```
+
+#### 8) 하드코딩 → Config 파일
+```csharp
+// ❌ 문제 (하드코딩된 연결 문자열)
+public void Connect()
+{
+    string connStr = "Server=localhost;Database=myDB;User=admin;Password=1234";
+    var conn = new SqlConnection(connStr);
+}
+
+// ✅ 개선 (appsettings.json으로 분리)
+public void Connect()
+{
+    string connStr = _configuration.GetConnectionString("DefaultConnection");
+    var conn = new SqlConnection(connStr);
+}
+
+// appsettings.json:
+// {
+//   "ConnectionStrings": {
+//     "DefaultConnection": "Server=localhost;Database=myDB;..."
+//   }
+// }
+```
+
 ### 2. 개선 코드 자동 생성
 
 LLM이 분석 결과를 바탕으로 리팩토링된 코드를 자동 생성합니다.
 - After 에디터에 실시간 표시
 - 복사 버튼으로 간편하게 적용
 
-### 3. 주석 자동 생성
+### 3. 스트리밍 출력 (실시간 코드 생성)
 
-```csharp
-/// <summary>
-/// 사용자 이름의 유효성을 검증합니다.
-/// </summary>
-/// <param name="name">검증할 사용자 이름</param>
-/// <returns>유효하면 true, 그렇지 않으면 false</returns>
-public bool ValidateUserName(string name)
-{
-    return !string.IsNullOrEmpty(name) && name.Length >= 3;
-}
-```
+LLM이 코드를 생성하는 과정을 실시간으로 확인할 수 있습니다:
+- **50 토큰 단위** 실시간 업데이트
+- **진행률 표시**: "AI 분석 중... (150 tokens 생성됨)"
+- **취소 기능**: 분석 중 언제든 중단 가능
+- **긴 파일 처리**: 최대 6144 토큰 출력 (Context: 8192)
 
 ### 4. 플로우 다이어그램 (Mermaid → PNG)
 
@@ -289,6 +329,48 @@ graph TD
 ```
 
 자동으로 PNG 이미지로 변환하여 리포트에 포함합니다.
+
+### 5. 통합 리포트 (프로젝트 전체 분석)
+
+폴더 선택 모드에서 프로젝트 전체를 분석하면 통합 리포트가 생성됩니다:
+
+```markdown
+# 📊 C# 프로젝트 코드 리뷰 통합 리포트
+
+## 📁 프로젝트 정보
+- **프로젝트명**: MyProject
+- **분석 일시**: 2025-01-19 15:30:00
+- **전체 파일**: 20개
+- **분석 성공**: 18개 ✅
+- **소요 시간**: 45.3초
+
+## 📈 카테고리별 이슈 통계
+
+| 카테고리 | 이슈 파일 수 | 비율 |
+|---------|-------------|------|
+| Null 참조 체크 | 8개 | 25.0% ████████░░ |
+| Exception 처리 | 6개 | 18.8% ██████░░░░ |
+| 리소스 관리 | 5개 | 15.6% █████░░░░░ |
+| 성능 최적화 | 4개 | 12.5% ████░░░░░░ |
+
+## 🎯 개선 우선순위 권장
+
+1. **보안** - 3개 파일에서 발견 (우선순위: 높음)
+2. **리소스 관리** - 5개 파일에서 발견 (우선순위: 높음)
+3. **Exception 처리** - 6개 파일에서 발견 (우선순위: 높음)
+```
+
+**차트 생성**: matplotlib를 사용한 원형 차트로 시각화
+
+### 6. Ollama 자동 관리
+
+애플리케이션 실행 시 Ollama 서버를 자동으로 시작하고, 종료 시 정리합니다:
+
+- **포터블 모드**: `./ollama_portable/ollama.exe` 자동 감지
+- **시스템 모드**: 시스템 Ollama 사용 (폴백)
+- **백그라운드 실행**: Windows 콘솔 창 숨김
+- **Graceful shutdown**: SIGTERM → 5초 대기 → SIGKILL
+- **Health check**: 30초 타임아웃으로 서버 준비 대기
 
 ---
 
@@ -359,20 +441,34 @@ var result = myObject?.ToString() ?? "N/A";
 - [x] 에러 복구 (3회 재시도)
 - [x] 분석 결과 요약
 
-### Phase 3: 폴더 선택 (현재 - Week 4)
-- [ ] 트리 구조 UI
-- [ ] 대용량 프로젝트 처리
-- [ ] 통합 리포트
+### Phase 3: 폴더 선택 ✅ 완료 (Week 4)
+- [x] 트리 구조 UI (QTreeView + QStandardItemModel)
+- [x] 재귀적 폴더 탐색 (.git, bin, obj 제외)
+- [x] 체크박스 부모/자식 동기화
+- [x] 파일 개수 제한 (최대 100개)
+- [x] 통합 리포트 생성 (IntegratedReportGenerator)
+- [x] 카테고리별 통계 분석
+- [x] 우선순위 권장 알고리즘
+- [x] matplotlib 차트 생성 (원형 차트)
 
-### Phase 4: 포터블 패키징 (Week 5)
-- [ ] PyInstaller EXE 빌드
-- [ ] Ollama 포터블 번들링
+### Phase 4: 포터블 패키징 ✅ 완료 (Week 5)
+- [x] PyInstaller EXE 빌드 (Day 16)
+  - [x] .spec 파일 구성
+  - [x] 자동화 빌드 스크립트
+  - [x] 리소스 번들링
+  - [x] UPX 압축
+- [x] Ollama 포터블 번들링 (Day 17)
+  - [x] OllamaManager (자동 시작/종료)
+  - [x] 포터블 모드 자동 감지
+  - [x] 번들 패키징 스크립트
+  - [x] Windows 콘솔 숨김
+- [x] 완전한 오프라인 패키지 (~2.5GB)
+
+### Phase 5: 최적화 (현재 - Week 6)
 - [ ] VDI 환경 테스트
-
-### Phase 5: 최적화 (Week 6)
 - [ ] 성능 최적화
 - [ ] 단위 테스트 (>80% 커버리지)
-- [ ] 사용자 가이드 작성
+- [ ] 최종 배포 패키지
 
 ---
 
@@ -382,18 +478,28 @@ var result = myObject?.ToString() ?? "N/A";
 - **Backend**: Python 3.11 + Ollama SDK
 - **Frontend**: PySide6 (Qt6 Python 바인딩)
 - **Markdown**: python-markdown + Pygments
+- **Charting**: matplotlib (통합 리포트 차트)
+- **Database**: SQLite (리포트 히스토리)
 - **Diagram**: Mermaid CLI
 - **Packaging**: PyInstaller
+- **Process Management**: subprocess (Ollama 자동 시작/종료)
 
 ---
 
 ## 문서
 
-- [프로젝트 계획서](docs/PROJECT_PLAN.md)
-- [개발 일정](docs/DEVELOPMENT_TIMELINE.md)
-- [기술 명세서](docs/TECHNICAL_SPECIFICATION.md)
-- [사용자 가이드](docs/USER_GUIDE.md)
-- [문제 해결](docs/TROUBLESHOOTING.md)
+### 개발 문서
+- [프로젝트 계획서](docs/PROJECT_PLAN.md) - 전체 프로젝트 개요 및 요구사항
+- [개발 일정](docs/DEVELOPMENT_TIMELINE.md) - 6주 개발 타임라인 (Day별 작업)
+- [기술 명세서](docs/TECHNICAL_SPECIFICATION.md) - 아키텍처 및 기술 상세
+
+### 빌드 & 배포
+- [빌드 가이드](docs/BUILD_GUIDE.md) - PyInstaller EXE 빌드 방법
+- [포터블 가이드](docs/PORTABLE_GUIDE.md) - 오프라인 포터블 패키지 생성 가이드
+
+### 사용자 문서
+- [사용자 가이드](docs/USER_GUIDE.md) - 기능별 사용법 (예정)
+- [문제 해결](docs/TROUBLESHOOTING.md) - 일반적인 문제 해결 (예정)
 
 ---
 
@@ -425,6 +531,30 @@ var result = myObject?.ToString() ?? "N/A";
 
 ---
 
-**작성일**: 2025-01-08
-**버전**: 1.0.0
+**최종 업데이트**: 2025-01-19
+**버전**: 1.0.0-rc (Release Candidate)
+**개발 진행**: Week 5 완료 (Day 17/18)
 **개발 기간**: 6주 (2025-01-08 ~ 2025-02-18)
+
+---
+
+## 프로젝트 상태
+
+현재 **Week 5 (Day 17) 완료** 상태입니다:
+
+### ✅ 완료된 기능
+- **Week 1-2**: MVP (텍스트 입력, 8가지 리뷰 카테고리, 리포트 생성)
+- **Week 3**: 파일 업로드 (배치 분석, 드래그 앤 드롭, 리포트 히스토리)
+- **Week 4**: 폴더 선택 (트리 구조, 통합 리포트, 차트 생성)
+- **Week 5**: 포터블 패키징 (PyInstaller EXE, Ollama 자동 시작/종료)
+
+### 🚧 진행 중
+- **Week 6**: 최종 테스트 및 최적화
+  - VDI 환경 테스트
+  - 성능 최적화
+  - 배포 패키지 생성
+
+### 📦 배포 준비 완료
+- EXE 빌드 시스템 완료
+- 포터블 번들링 가이드 완료
+- 오프라인 실행 검증 완료
