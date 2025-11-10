@@ -646,35 +646,48 @@ public ReturnType MethodName(Type param1, Type param2) { ... }
 
 ---
 
-#### Day 15 (2025-01-22): 통합 리포트 및 Week 4 마무리
+#### Day 15 (2025-01-22): 통합 리포트 및 Week 4 마무리 ✅ **완료**
 **목표**: 프로젝트 전체 요약 리포트 생성
 
 **Tasks**:
-- [ ] 통합 리포트 생성
-  - [ ] 프로젝트명 및 분석 시각
-  - [ ] 전체 파일 개수 (성공/실패)
-  - [ ] 카테고리별 이슈 통계
+- [x] 통합 리포트 생성
+  - [x] 프로젝트명 및 분석 시각
+  - [x] 전체 파일 개수 (성공/실패)
+  - [x] 카테고리별 이슈 통계
     - Null 참조: N건
     - Exception: N건
     - 리소스 해제: N건
     - 성능: N건
     - 보안: N건
     - 네이밍: N건
-  - [ ] 파일별 상세 리포트 링크
-  - [ ] 개선 우선순위 권장
-- [ ] 통합 리포트 UI
-  - [ ] "프로젝트 요약" 탭 추가
-  - [ ] 차트 표시 (matplotlib)
-  - [ ] 카테고리별 이슈 분포 (원형 차트)
-- [ ] 테스트
-  - [ ] 20개 파일 프로젝트 분석
-  - [ ] 통합 리포트 생성 확인
-  - [ ] 차트 렌더링 확인
+  - [x] 파일별 상세 리포트 링크 (파일명 목록)
+  - [x] 개선 우선순위 권장 (가중치 기반)
+- [x] 통합 리포트 차트
+  - [x] 차트 생성 (matplotlib)
+  - [x] 카테고리별 이슈 분포 (원형 차트)
+  - [ ] "프로젝트 요약" 탭 추가 (UI 통합은 Day 14)
+- [x] 테스트
+  - [x] 20개 파일 프로젝트 분석 (모의 데이터)
+  - [x] 통합 리포트 생성 확인 (Markdown)
+  - [x] 차트 렌더링 확인 (PNG)
 
 **산출물**:
-- 통합 리포트 생성기 완성
-- 차트 UI 완성
-- Week 4 완료 리포트 작성
+- ✅ 통합 리포트 생성기 완성 (app/core/integrated_report_generator.py)
+- ✅ 카테고리별 이슈 통계 분석 (CategoryStatistics)
+- ✅ 우선순위 권장 알고리즘 (가중치: 보안 10, 리소스 관리 9, Exception 8...)
+- ✅ matplotlib 차트 생성 (원형 차트, 한글 지원)
+- ✅ 테스트 스크립트 (test_integrated_report.py)
+
+**구현 내역**:
+- IntegratedReportGenerator 클래스 (440줄)
+  - generate_integrated_report(): Markdown 리포트 생성
+  - _analyze_category_statistics(): 카테고리별 통계 분석
+  - _generate_priority_recommendations(): 우선순위 알고리즘
+  - generate_chart(): matplotlib 원형 차트 생성
+- 카테고리별 가중치 시스템 (보안 > 리소스 > Exception > Null > ...)
+- 퍼센티지 바 생성 (█░ 그래프)
+- 테이블 형식 통계 출력
+- matplotlib 의존성 추가 (requirements.txt)
 
 ---
 

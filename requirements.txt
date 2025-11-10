@@ -16,5 +16,8 @@ pytest-cov>=4.1.0
 # Packaging
 PyInstaller>=6.3.0
 
+# Charting
+matplotlib>=3.10.0
+
 # Utilities
 python-dotenv>=1.0.0
