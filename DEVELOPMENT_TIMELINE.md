@@ -583,32 +583,40 @@ public ReturnType MethodName(Type param1, Type param2) { ... }
 
 ### Week 4: 폴더 선택 모드 (Day 13-15)
 
-#### Day 13 (2025-01-20): 트리 구조 UI 및 재귀 탐색
+#### Day 13 (2025-01-20): 트리 구조 UI 및 재귀 탐색 ✅ **완료**
 **목표**: 폴더 구조를 트리로 표시
 
 **Tasks**:
-- [ ] `app/ui/folder_select_widget.py` 구현
-  - [ ] QTreeView 초기화
-  - [ ] "폴더 선택" 버튼 (QFileDialog)
-  - [ ] 트리 모델 생성 (QStandardItemModel)
-  - [ ] 체크박스 항목 (Qt.ItemIsUserCheckable)
-- [ ] 재귀 탐색 로직
-  - [ ] os.walk() 사용
-  - [ ] `.cs` 파일만 필터링
-  - [ ] 숨김 폴더 제외 (.git, .vs, bin, obj)
-  - [ ] 파일 개수 카운팅
-- [ ] 트리 UI 개선
-  - [ ] 폴더 아이콘/파일 아이콘
-  - [ ] 확장/축소 애니메이션
-  - [ ] "전체 선택" / "전체 해제" 버튼
-- [ ] 테스트
-  - [ ] 중첩된 폴더 구조 표시 확인
-  - [ ] 체크박스 선택 동작 확인
+- [x] `app/ui/folder_select_widget.py` 구현
+  - [x] QTreeView 초기화
+  - [x] "폴더 선택" 버튼 (QFileDialog)
+  - [x] 트리 모델 생성 (QStandardItemModel)
+  - [x] 체크박스 항목 (Qt.ItemIsUserCheckable)
+- [x] 재귀 탐색 로직
+  - [x] os.walk() 사용
+  - [x] `.cs` 파일만 필터링
+  - [x] 숨김 폴더 제외 (.git, .vs, bin, obj)
+  - [x] 파일 개수 카운팅
+- [x] 트리 UI 개선
+  - [x] 폴더 아이콘/파일 아이콘
+  - [x] 확장/축소 애니메이션
+  - [x] "전체 선택" / "전체 해제" 버튼
+- [x] 테스트
+  - [x] 중첩된 폴더 구조 표시 확인
+  - [x] 체크박스 선택 동작 확인
 
 **산출물**:
-- 폴더 선택 위젯 완성
-- 재귀 탐색 로직 구현
-- 트리 UI 동작 확인
+- ✅ 폴더 선택 위젯 완성 (app/ui/folder_select_widget.py)
+- ✅ 재귀 탐색 로직 구현 (_scan_folder, _build_tree_recursive)
+- ✅ 트리 UI 동작 확인 (test_folder_select_widget.py)
+
+**구현 내역**:
+- 637줄 완전 구현 (QTreeView, QStandardItemModel, 체크박스, 시그널)
+- 제외 폴더: .git, .vs, .vscode, bin, obj, node_modules, packages
+- 최대 100개 파일 제한
+- 실시간 선택 개수 표시
+- 부모/자식 간 체크 상태 연동 (PartiallyChecked 지원)
+- files_changed 시그널로 외부 통합 준비 완료
 
 ---
 
