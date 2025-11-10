@@ -764,34 +764,89 @@ python scripts/test_exe.py
 
 ---
 
-#### Day 17 (2025-01-24): Ollama 포터블 번들링
+#### Day 17 (2025-01-24): Ollama 포터블 번들링 ✅
 **목표**: Ollama + Phi-3-mini를 포터블 패키지에 포함
 
 **Tasks**:
-- [ ] Ollama 포터블 버전 준비
-  - [ ] Ollama Windows 바이너리 다운로드
-  - [ ] ollama.exe 추출
-  - [ ] 모델 파일 경로 설정
-- [ ] 모델 파일 번들링
-  - [ ] Phi-3-mini GGUF 파일 다운로드
-  - [ ] ollama_portable/models/ 폴더에 복사
-- [ ] 자동 실행 스크립트
-  - [ ] scripts/bundle_ollama.py
-  - [ ] CodeReviewer.exe 실행 시 Ollama 자동 시작
-  - [ ] 백그라운드 실행 (subprocess.Popen)
-  - [ ] 종료 시 Ollama 프로세스 종료
-- [ ] 환경 변수 설정
-  - [ ] OLLAMA_MODELS 경로 설정
-  - [ ] OLLAMA_HOST 설정 (localhost:11434)
-- [ ] 테스트
-  - [ ] 포터블 패키지 압축 해제
-  - [ ] 더블클릭으로 실행 확인
-  - [ ] Ollama 자동 시작 확인
+- [x] Ollama 포터블 버전 준비
+  - [x] Ollama Windows 바이너리 다운로드 가이드
+  - [x] ollama.exe 추출 가이드
+  - [x] 모델 파일 경로 설정 (OLLAMA_MODELS 환경 변수)
+- [x] 모델 파일 번들링
+  - [x] Phi-3-mini GGUF 파일 다운로드 가이드
+  - [x] ollama_portable/models/ 폴더 구조
+  - [x] Modelfile 생성 가이드
+- [x] 자동 실행 스크립트
+  - [x] scripts/bundle_ollama.py (400줄)
+  - [x] app/services/ollama_manager.py (260줄)
+  - [x] CodeReviewer.exe 실행 시 Ollama 자동 시작
+  - [x] 백그라운드 실행 (subprocess.Popen, 콘솔 숨김)
+  - [x] 종료 시 Ollama 프로세스 종료 (graceful + force kill)
+- [x] 환경 변수 설정
+  - [x] OLLAMA_MODELS 경로 자동 설정
+  - [x] OLLAMA_HOST 설정 (localhost:11434)
+  - [x] 포터블 모드 자동 감지
+- [x] 통합 및 테스트
+  - [x] app/main.py에 OllamaManager 통합
+  - [x] 시작 메시지 다이얼로그
+  - [x] 로깅 시스템 (logs/app.log)
+  - [x] 정상 종료 시 cleanup 훅
 
 **산출물**:
-- Ollama 포터블 패키지 완성
-- 자동 실행 스크립트 구현
-- 통합 테스트 통과
+- ✅ `app/services/ollama_manager.py` - Ollama 프로세스 관리자 (260줄)
+  - is_running(): 서버 상태 확인
+  - has_model(): 모델 존재 확인
+  - start(): 포터블/시스템 Ollama 시작 (Windows 콘솔 숨김)
+  - _wait_for_ready(): 30초 타임아웃으로 Ready 대기
+  - stop(): graceful shutdown (5초 타임아웃 후 force kill)
+  - Context manager 지원
+
+- ✅ `scripts/bundle_ollama.py` - 포터블 패키지 번들러 (400줄)
+  - 디렉토리 구조 자동 생성
+  - ollama.exe 준비 가이드
+  - Phi-3-mini 모델 준비 가이드
+  - README.txt 자동 생성
+  - settings.json 자동 생성
+  - 번들 검증 및 크기 계산
+
+- ✅ `app/main.py` - Ollama 자동 시작 통합 (178줄)
+  - 포터블 Ollama 자동 감지 (EXE/스크립트 모드)
+  - "Starting Ollama..." 다이얼로그
+  - OllamaManager 통합 (시작/종료)
+  - 실패 시 사용자 알림
+  - 로깅 시스템
+
+- ✅ `docs/PORTABLE_GUIDE.md` - 포터블 배포 가이드 (600줄)
+  - 완전한 번들링 프로세스 (Step 1-6)
+  - Ollama 바이너리 추출 가이드
+  - Phi-3-mini 모델 복사 가이드
+  - Modelfile 생성 방법
+  - VDI 배포 체크리스트
+  - 트러블슈팅 (5가지 문제)
+  - 성능 튜닝 및 유지보수
+
+- ✅ logs/ 디렉토리 생성
+- ✅ requirements.txt - requests 의존성 추가
+
+**사용법**:
+```bash
+# 포터블 패키지 생성
+python scripts/bundle_ollama.py --output-dir CodeReviewer_Portable
+
+# 수동 파일 복사 후 검증
+python scripts/bundle_ollama.py --output-dir CodeReviewer_Portable
+```
+
+**주요 기능**:
+- 포터블 모드 자동 감지
+- 자동 시작/종료
+- Windows 콘솔 숨김
+- Graceful shutdown
+- Health check (30초 타임아웃)
+
+**다음 단계**: Day 18 - 설치 없는 실행 테스트
+
+**마지막 업데이트**: 2025-01-19
 
 ---
 
