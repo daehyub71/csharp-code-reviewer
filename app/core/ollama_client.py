@@ -168,7 +168,7 @@ class OllamaClient:
                 options={
                     "temperature": self.temperature,
                     "top_p": self.top_p,
-                    "num_predict": 2048  # Max tokens to generate
+                    "num_predict": 4096  # Max tokens to generate (increased for full code rewrite)
                 }
             )
 
@@ -205,7 +205,7 @@ class OllamaClient:
                 options={
                     "temperature": self.temperature,
                     "top_p": self.top_p,
-                    "num_predict": 2048
+                    "num_predict": 4096  # Max tokens to generate (increased for full code rewrite)
                 }
             )
 
