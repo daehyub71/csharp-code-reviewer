@@ -142,7 +142,8 @@ class ReportGenerator:
             'performance': '성능 최적화',
             'security': '보안',
             'naming_convention': '네이밍 컨벤션',
-            'code_documentation': 'XML 문서 주석'
+            'code_documentation': 'XML 문서 주석',
+            'hardcoding_to_config': '하드코딩 → Config 파일'
         }
 
         items = [f"- ✅ **{category_names.get(cat, cat)}**" for cat in categories]

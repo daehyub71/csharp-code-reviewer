@@ -763,7 +763,8 @@ class MainWindow(QMainWindow):
                     f"• 성능 최적화\n"
                     f"• 보안\n"
                     f"• 네이밍 컨벤션\n"
-                    f"• XML 문서 주석\n\n"
+                    f"• XML 문서 주석\n"
+                    f"• 하드코딩 → Config 파일\n\n"
                     f"개선된 코드가 텍스트 입력 탭에 표시되었습니다."
                     f"{saved_paths_msg}"
                 )
@@ -779,7 +780,8 @@ class MainWindow(QMainWindow):
                     f"• 성능 최적화\n"
                     f"• 보안\n"
                     f"• 네이밍 컨벤션\n"
-                    f"• XML 문서 주석\n\n"
+                    f"• XML 문서 주석\n"
+                    f"• 하드코딩 → Config 파일\n\n"
                     f"개선된 코드가 After 에디터에 표시되었습니다.\n"
                     f"리포트를 저장하려면 '💾 Save Report' 버튼을 사용하세요."
                 )
