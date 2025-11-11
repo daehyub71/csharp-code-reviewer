@@ -279,7 +279,69 @@ curl http://localhost:11434/api/tags
 
 ## Advanced: Cross-Platform Builds
 
-### Building on Windows
+### ⭐ Building on macOS → Windows (Recommended: GitHub Actions)
+
+**PyInstaller cannot cross-compile** (macOS → Windows EXE not possible).
+
+**Best Solution**: Use GitHub Actions to build on Windows automatically.
+
+#### Setup GitHub Actions Workflow
+
+1. **Ensure workflow file exists**:
+   ```bash
+   ls .github/workflows/build-windows.yml
+   ```
+
+2. **Commit and push**:
+   ```bash
+   git add .github/workflows/build-windows.yml
+   git commit -m "feat: Add GitHub Actions Windows build workflow"
+   git push origin main
+   ```
+
+3. **Workflow runs automatically** on:
+   - Every push to `main` branch
+   - Every pull request
+   - Manual trigger (Actions tab → Run workflow)
+   - Git tags (e.g., `v1.0.0` → creates GitHub Release)
+
+#### Download Built EXE
+
+**Option 1: From GitHub Actions Artifacts**
+
+```bash
+# 1. Go to: https://github.com/YOUR_USERNAME/csharp-code-reviewer/actions
+# 2. Click latest workflow run
+# 3. Download "CodeReviewer-Windows-EXE" artifact
+# 4. Extract ZIP → CodeReviewer.exe
+```
+
+**Option 2: From GitHub Releases (for tagged versions)**
+
+```bash
+# 1. Create version tag
+git tag v1.0.0
+git push origin v1.0.0
+
+# 2. Workflow builds and creates release automatically
+# 3. Download from: https://github.com/YOUR_USERNAME/csharp-code-reviewer/releases
+```
+
+#### Manual Trigger
+
+```bash
+# 1. Go to: https://github.com/YOUR_USERNAME/csharp-code-reviewer/actions
+# 2. Select "Build Windows EXE" workflow
+# 3. Click "Run workflow" → Choose branch → Run
+# 4. Wait 5-10 minutes
+# 5. Download artifact
+```
+
+---
+
+### Building Directly on Windows
+
+If you have access to a Windows machine:
 
 ```bash
 # On Windows machine
@@ -288,28 +350,84 @@ python scripts/build_exe.py --clean
 # Output: dist/CodeReviewer.exe (Windows native)
 ```
 
-### Building on macOS (Wine)
+---
+
+### Building on macOS with Virtual Machine
+
+If GitHub Actions is not suitable, use a VM:
+
+1. **Install VM software**:
+   ```bash
+   # Parallels (paid, best performance)
+   # VMware Fusion (paid)
+   # VirtualBox (free)
+   brew install --cask virtualbox
+   ```
+
+2. **Create Windows 10/11 VM**:
+   - Download Windows ISO from Microsoft
+   - Install Python 3.11
+   - Clone repository
+   - Run build script
+
+3. **Build inside VM**:
+   ```bash
+   python scripts/build_exe.py --clean
+   ```
+
+---
+
+### Building on macOS (Wine) - ⚠️ Not Recommended
+
+Wine-based cross-compilation is **experimental and unreliable**:
 
 ```bash
 # Install Wine (if not installed)
 brew install wine-stable
 
-# Cross-compile for Windows (experimental)
-# Note: May have issues, recommend building on Windows
+# Install Windows Python in Wine (complex)
+# https://www.python.org/downloads/windows/
+
+# Cross-compile for Windows (may fail)
+wine python scripts/build_exe.py
 ```
+
+**Issues**:
+- Complex setup
+- Frequent build failures
+- Missing DLLs
+- Hard to debug
+
+**Recommendation**: Use GitHub Actions instead.
+
+---
 
 ### Building for macOS (App Bundle)
 
+To build macOS native app:
+
 ```bash
-# Use .spec file for macOS
-# Change:
-exe = EXE(...) → app = BUNDLE(...)
+# 1. Edit CodeReviewer.spec
+# Change EXE to BUNDLE:
 
-# Build
-python scripts/build_exe.py
+app = BUNDLE(
+    exe,
+    name='CodeReviewer.app',
+    icon=None,
+    bundle_identifier='com.csharp.coderereviewer',
+)
 
-# Output: dist/CodeReviewer.app
+# 2. Build
+python scripts/build_exe.py --clean
+
+# 3. Output
+# dist/CodeReviewer.app
+
+# 4. Test
+open dist/CodeReviewer.app
 ```
+
+**Note**: macOS builds require code signing for distribution.
 
 ---
 

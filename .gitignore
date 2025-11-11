@@ -95,6 +95,8 @@ reports/
 CodeReviewer.exe
 ollama_portable/
 CodeReviewer_Portable/
+*.tar.gz
+*.zip
 
 # Temporary files
 *.tmp

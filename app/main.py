@@ -135,6 +135,11 @@ def main():
 
     # Close startup message
     startup_msg.close()
+    startup_msg.deleteLater()  # Explicitly delete the dialog
+    app.processEvents()  # Force UI update to close the dialog
+
+    # Give Qt time to cleanup
+    QApplication.processEvents()
 
     if not ollama_started:
         logger.error("Failed to start Ollama")
