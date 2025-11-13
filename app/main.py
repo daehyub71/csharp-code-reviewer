@@ -27,12 +27,16 @@ from app.ui.main_window import MainWindow
 from app.services.ollama_manager import OllamaManager
 
 
+# Ensure logs directory exists
+logs_dir = Path("logs")
+logs_dir.mkdir(parents=True, exist_ok=True)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("logs/app.log", encoding='utf-8'),
+        logging.FileHandler(logs_dir / "app.log", encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
